@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InvenTrack Pro</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); color: white; padding: 16px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 24px;">📦</span>
+                <h1 style="font-size: 20px; margin: 0;">InvenTrack Pro</h1>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div id="syncIndicator" style="padding: 6px 12px; background: rgba(255,255,255,0.2); border-radius: 6px; font-size: 12px; color: #86efac;">
+                    <span>●</span> <span id="syncText">Synced</span>
+                </div>
+                <button id="menuBtn" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 10px 16px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">☰</button>
+            </div>
+        </div>
+
+        <div id="menuOverlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: none;"></div>
+        
+        <div id="menuPanel" style="position: fixed; top: 0; left: 0; bottom: 0; width: 280px; background: white; z-index: 2001; transform: translateX(-100%); transition: transform 0.3s; overflow-y: auto; box-shadow: 2px 0 12px rgba(0,0,0,0.2);">
+            <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); color: white; padding: 20px; font-size: 20px; font-weight: 600;">📦 Navigation</div>
+            <div class="menu-item active" data-tab="dashboard" style="padding: 18px 20px; border-bottom: 1px solid #e0e0e0; cursor: pointer; font-size: 16px; font-weight: 500;">
+                <span>📊</span> Dashboard
+            </div>
+            <div class="menu-item" data-tab="add-edit" style="padding: 18px 20px; border-bottom: 1px solid #e0e0e0; cursor: pointer; font-size: 16px; font-weight: 500;">
+                <span>⚙️</span> Add/Edit Items
+            </div>
+            <div class="menu-item" data-tab="inventory" style="padding: 18px 20px; border-bottom: 1px solid #e0e0e0; cursor: pointer; font-size: 16px; font-weight: 500;">
+                <span>📋</span> Inventory View
+            </div>
+            <div class="menu-item" data-tab="physical-count" style="padding: 18px 20px; border-bottom: 1px solid #e0e0e0; cursor: pointer; font-size: 16px; font-weight: 500;">
+                <span>📱</span> Physical Count
+            </div>
+            <div class="menu-item" data-tab="scan-count" style="padding: 18px 20px; border-bottom: 1px solid #e0e0e0; cursor: pointer; font-size: 16px; font-weight: 500;">
+                <span>📷</span> Scan Count
+            </div>
+            <div class="menu-item" data-tab="count-reports" style="padding: 18px 20px; border-bottom: 1px solid #e0e0e0; cursor: pointer; font-size: 16px; font-weight: 500;">
+                <span>📊</span> Count Reports
+            </div>
+            <div class="menu-item" data-tab="import-export" style="padding: 18px 20px; border-bottom: 1px solid #e0e0e0; cursor: pointer; font-size: 16px; font-weight: 500;">
+                <span>📁</span> Import/Export
+            </div>
+        </div>
+
+        <div style="padding: 12px; max-width: 1200px; margin: 0 auto;">
+            <div id="dashboard-tab" class="tab-content" style="display: block;">
+                <div id="notification" style="padding: 14px; margin-bottom: 16px; border-radius: 8px; font-weight: 500; display: none;"></div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px;">
+                    <div style="background: white; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                        <div style="font-size: 32px; margin-bottom: 8px;">📦</div>
+                        <div id="statTotal" style="font-size: 32px; font-weight: 700; color: #1e293b; margin-bottom: 4px;">0</div>
+                        <div style="font-size: 13px; color: #64748b; font-weight: 500;">Total Items</div>
+                    </div>
+                    <div style="background: white; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                        <div style="font-size: 32px; margin-bottom: 8px;">⚠️</div>
+                        <div id="statLowStock" style="font-size: 32px; font-weight: 700; color: #1e293b; margin-bottom: 4px;">0</div>
+                        <div style="font-size: 13px; color: #64748b; font-weight: 500;">Low Stock</div>
+                    </div>
+                    <div style="background: white; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                        <div style="font-size: 32px; margin-bottom: 8px;">❌</div>
+                        <div id="statOutStock" style="font-size: 32px; font-weight: 700; color: #1e293b; margin-bottom: 4px;">0</div>
+                        <div style="font-size: 13px; color: #64748b; font-weight: 500;">Out of Stock</div>
+                    </div>
+                </div>
+                <div style="background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                    <button id="btnAddItem" style="padding: 14px 20px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #3b82f6; color: white; margin-right: 8px;">➕ Add Item</button>
+                    <button id="btnExport" style="padding: 14px 20px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #f59e0b; color: white;">📤 Export</button>
+                </div>
+            </div>
+
+            <div id="add-edit-tab" class="tab-content" style="display: none;">
+                <div style="background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 16px;">
+                    <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0;">Item Information</h2>
+                    <div style="margin-bottom: 16px; position: relative;">
+                        <label style="display: block; margin-bottom: 6px; font-weight: 600; color: #555; font-size: 14px;">SKU *</label>
+                        <input type="text" id="sku" placeholder="Enter SKU" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; text-transform: uppercase;" autocomplete="off">
+                        <div id="skuDropdown" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 2px solid #3b82f6; border-radius: 8px; max-height: 300px; overflow-y: auto; display: none; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-top: 4px;"></div>
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; margin-bottom: 6px; font-weight: 600; color: #555; font-size: 14px;">Description</label>
+                        <input type="text" id="description" placeholder="Item description" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px;">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                        <div>
+                            <label style="display: block; margin-bottom: 6px; font-weight: 600; color: #555; font-size: 14px;">Qty on Hand</label>
+                            <input type="number" id="qtyOnHand" placeholder="0" min="0" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px;">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 6px; font-weight: 600; color: #555; font-size: 14px;">Min</label>
+                            <input type="number" id="stockMin" placeholder="Min" min="0" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px;">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 6px; font-weight: 600; color: #555; font-size: 14px;">Max</label>
+                            <input type="number" id="stockMax" placeholder="Max" min="0" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; margin-bottom: 6px; font-weight: 600; color: #555; font-size: 14px;">Location</label>
+                        <input type="text" id="location" placeholder="e.g., A1-B2-C3" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; text-transform: uppercase;">
+                    </div>
+                    <button id="btnSave" style="padding: 14px 20px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #3b82f6; color: white; margin-right: 8px;">💾 Save</button>
+                    <button id="btnClear" style="padding: 14px 20px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #64748b; color: white;">🔄 Clear</button>
+                </div>
+            </div>
+
+            <div id="inventory-tab" class="tab-content" style="display: none;">
+                <div style="background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 16px;">
+                    <input type="text" id="searchBox" placeholder="🔍 Search..." style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div id="itemCount" style="color: #64748b; font-size: 14px; font-weight: 600;">0 items</div>
+                        <div id="massDeleteControls" style="display: none;">
+                            <button id="btnDeleteSelected" style="padding: 10px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; background: #ef4444; color: white;">🗑️ Delete Selected (<span id="selectedCount">0</span>)</button>
+                        </div>
+                    </div>
+                </div>
+                <div style="background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                    <div id="inventoryTable"></div>
+                </div>
+            </div>
+
+            <div id="physical-count-tab" class="tab-content" style="display: none;">
+                <div id="countSession" style="display: none;">
+                    <div style="background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <div>
+                                <div style="font-size: 18px; font-weight: 600;">Session: <span id="sessionName"></span></div>
+                                <div style="font-size: 13px; color: #64748b; margin-top: 4px;">
+                                    Progress: <span id="countProgress" style="font-weight: 600; color: #3b82f6;">0/0</span>
+                                </div>
+                            </div>
+                            <button id="btnFinishCount" style="padding: 10px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; background: #10b981; color: white;">✓ Finish</button>
+                        </div>
+                        <div style="font-size: 12px; color: #64748b;">
+                            Sorted by: <span id="sortMethod" style="font-weight: 600;"></span>
+                        </div>
+                    </div>
+                    
+                    <div id="currentItemCard" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 16px;">
+                        <div style="text-align: center; margin-bottom: 16px;">
+                            <div style="font-size: 28px; font-weight: 700; color: #1e293b; margin-bottom: 4px;" id="countSKU"></div>
+                            <div style="font-size: 16px; color: #64748b; margin-bottom: 8px;" id="countDescription"></div>
+                            <div style="font-size: 14px; color: #94a3b8;">Location: <span id="countLocation" style="font-weight: 600; color: #1e40af;"></span></div>
+                        </div>
+                        
+                        <div style="background: #f8fafc; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                            <div style="text-align: center; margin-bottom: 8px; font-size: 13px; color: #64748b; font-weight: 600;">SYSTEM QTY</div>
+                            <div style="text-align: center; font-size: 32px; font-weight: 700; color: #64748b;" id="systemQty">0</div>
+                        </div>
+                        
+                        <div style="text-align: center; margin-bottom: 12px; font-size: 13px; color: #1e293b; font-weight: 600;">ACTUAL COUNT</div>
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 20px;">
+                            <button id="btnMinus" style="width: 70px; height: 70px; border: none; border-radius: 12px; font-size: 32px; font-weight: 700; cursor: pointer; background: #ef4444; color: white;">−</button>
+                            <input type="number" id="actualCount" value="0" min="0" readonly style="width: 120px; height: 70px; padding: 0; border: 3px solid #3b82f6; border-radius: 12px; font-size: 36px; font-weight: 700; text-align: center; cursor: pointer;">
+                            <button id="btnPlus" style="width: 70px; height: 70px; border: none; border-radius: 12px; font-size: 32px; font-weight: 700; cursor: pointer; background: #10b981; color: white;">+</button>
+                        </div>
+                        
+                        <div id="varianceDisplay" style="text-align: center; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-weight: 600; display: none;"></div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <button id="btnSaveCount" style="padding: 18px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #3b82f6; color: white;">💾 Save & Next</button>
+                            <button id="btnSkipItem" style="padding: 18px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #64748b; color: white;">⏭️ Skip</button>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <button id="btnPrevItem" style="padding: 12px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; background: #f1f5f9; color: #64748b;">← Previous</button>
+                    </div>
+                </div>
+                
+                <div id="startCountScreen">
+                    <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 16px;">
+                        <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 16px;">📱 Physical Count</h2>
+                        <p style="color: #64748b; margin-bottom: 20px; line-height: 1.6;">
+                            Start a new counting session. Walk down your aisle and count items in order. Your progress will be saved automatically.
+                        </p>
+                        
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 600;">Session Name</label>
+                            <input type="text" id="sessionNameInput" placeholder="e.g., Filter Shelf Count" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px;">
+                        </div>
+                        
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 600;">Sort Order</label>
+                            <select id="countSortOrder" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px;">
+                                <option value="location">By Location (A1, A2, A3...)</option>
+                                <option value="sku">By SKU (P165789, P165800...)</option>
+                            </select>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 600;">Filter by Location (Optional)</label>
+                            <input type="text" id="locationFilter" placeholder="e.g., A1 (leave empty for all)" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; text-transform: uppercase;">
+                            <small style="color: #64748b; font-size: 13px; display: block; margin-top: 6px;">
+                                Start typing location prefix to filter items (e.g., "A1" for all items in A1-*)
+                            </small>
+                        </div>
+                        
+                        <button id="btnStartCount" style="padding: 16px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #10b981; color: white; width: 100%;">🚀 Start Counting</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="scan-count-tab" class="tab-content" style="display: none;">
+                <div id="scanCountSession" style="display: none;">
+                    <div style="background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <div>
+                                <div style="font-size: 18px; font-weight: 600;">📷 Scan Session</div>
+                                <div style="font-size: 13px; color: #64748b; margin-top: 4px;">
+                                    Counted: <span id="scanProgress" style="font-weight: 600; color: #3b82f6;">0</span>
+                                </div>
+                            </div>
+                            <button id="btnFinishScanCount" style="padding: 10px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; background: #10b981; color: white;">✓ Finish</button>
+                        </div>
+                    </div>
+                    
+                    <div id="scanItemCard" style="display: none; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 16px;">
+                        <div style="text-align: center; margin-bottom: 16px;">
+                            <div style="font-size: 28px; font-weight: 700; color: #1e293b; margin-bottom: 4px;" id="scanSKU"></div>
+                            <div style="font-size: 16px; color: #64748b; margin-bottom: 8px;" id="scanDescription"></div>
+                            <div style="font-size: 14px; color: #94a3b8;">Location: <span id="scanLocation" style="font-weight: 600; color: #1e40af;"></span></div>
+                        </div>
+                        
+                        <div style="background: #f8fafc; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                            <div style="text-align: center; margin-bottom: 8px; font-size: 13px; color: #64748b; font-weight: 600;">SYSTEM QTY</div>
+                            <div style="text-align: center; font-size: 32px; font-weight: 700; color: #64748b;" id="scanSystemQty">0</div>
+                        </div>
+                        
+                        <div style="text-align: center; margin-bottom: 12px; font-size: 13px; color: #1e293b; font-weight: 600;">ACTUAL COUNT</div>
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 20px;">
+                            <button id="btnScanMinus" style="width: 70px; height: 70px; border: none; border-radius: 12px; font-size: 32px; font-weight: 700; cursor: pointer; background: #ef4444; color: white;">−</button>
+                            <input type="number" id="scanActualCount" value="0" min="0" readonly style="width: 120px; height: 70px; padding: 0; border: 3px solid #3b82f6; border-radius: 12px; font-size: 36px; font-weight: 700; text-align: center; cursor: pointer;">
+                            <button id="btnScanPlus" style="width: 70px; height: 70px; border: none; border-radius: 12px; font-size: 32px; font-weight: 700; cursor: pointer; background: #10b981; color: white;">+</button>
+                        </div>
+                        
+                        <div id="scanVarianceDisplay" style="text-align: center; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-weight: 600; display: none;"></div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <button id="btnSaveScanCount" style="padding: 18px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #3b82f6; color: white;">💾 Save</button>
+                            <button id="btnCancelScan" style="padding: 18px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #64748b; color: white;">✕ Cancel</button>
+                        </div>
+                    </div>
+                    
+                    <div id="scanCameraScreen">
+                        <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;">
+                            <div style="font-size: 48px; margin-bottom: 16px;">📷</div>
+                            <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 12px;">Scan Item Label</h3>
+                            <p style="color: #64748b; margin-bottom: 20px;">Point camera at SKU/Part Number</p>
+                            
+                            <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;">
+                            <button id="btnTakePicture" style="width: 100%; padding: 20px; border: none; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white; margin-bottom: 12px;">📸 Take Picture</button>
+                            
+                            <button id="btnManualSearch" style="width: 100%; padding: 16px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #f1f5f9; color: #64748b;">⌨️ Type SKU Manually</button>
+                        </div>
+                    </div>
+                    
+                    <div id="skuPickerScreen" style="display: none;">
+                        <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                            <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 16px;">Select the correct SKU:</h3>
+                            <div id="detectedSKUs"></div>
+                            <button id="btnRescan" style="width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #64748b; color: white; margin-top: 12px;">📷 Scan Again</button>
+                        </div>
+                    </div>
+                    
+                    <div id="manualSearchScreen" style="display: none;">
+                        <div style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); height: 100vh; display: flex; flex-direction: column;">
+                            <!-- Top section - display and matches (scrollable) -->
+                            <div style="flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 0;">
+                                <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 16px;">Type SKU:</h3>
+                                
+                                <!-- Display what's typed -->
+                                <div style="background: #f8fafc; border: 3px solid #3b82f6; border-radius: 12px; padding: 20px; margin-bottom: 16px; min-height: 70px; font-size: 32px; font-weight: 700; text-align: center; color: #1e293b; word-break: break-all;" id="skuDisplay">
+                                    <span id="skuTyped"></span><span style="opacity: 0.3;">|</span>
+                                </div>
+                                
+                                <!-- Autocomplete dropdown -->
+                                <div id="quickMatchDropdown" style="max-height: 300px; overflow-y: auto; margin-bottom: 16px; display: none;"></div>
+                            </div>
+                            
+                            <!-- Bottom section - keyboard (fixed) -->
+                            <div style="padding: 16px; background: white; border-top: 2px solid #e2e8f0;">
+                                <!-- Letter buttons (common prefixes) -->
+                                <div style="margin-bottom: 8px;">
+                                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 6px;">
+                                        <button onclick="addToSKU('P')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af;">P</button>
+                                        <button onclick="addToSKU('M')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af;">M</button>
+                                        <button onclick="addToSKU('W')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af;">W</button>
+                                        <button onclick="addToSKU('G')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af;">G</button>
+                                        <button onclick="addToSKU('H')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af;">H</button>
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;">
+                                        <button onclick="addToSKU('A')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b;">A</button>
+                                        <button onclick="addToSKU('B')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b;">B</button>
+                                        <button onclick="addToSKU('C')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b;">C</button>
+                                        <button onclick="addToSKU('D')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b;">D</button>
+                                        <button onclick="addToSKU('-')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b;">-</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Number pad -->
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px;">
+                                    <button onclick="addToSKU('1')" style="padding: 15px; border: none; border-radius: 10px; font-size: 20px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">1</button>
+                                    <button onclick="addToSKU('2')" style="padding: 15px; border: none; border-radius: 10px; font-size: 20px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">2</button>
+                                    <button onclick="addToSKU('3')" style="padding: 15px; border: none; border-radius: 10px; font-size: 20px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">3</button>
+                                    <button onclick="addToSKU('4')" style="padding: 15px; border: none; border-radius: 10px; font-size: 20px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">4</button>
+                                    <button onclick="addToSKU('5')" style="padding: 15px; border: none; border-radius: 10px; font-size: 20px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">5</button>
+                                    <button onclick="addToSKU('6')" style="padding: 15px; border: none; border-radius: 10px; font-size: 20px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">6</button>
+                                    <button onclick="addToSKU('7')" style="padding: 15px; border: none; border-radius: 10px; font-size: 20px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">7</button>
+                                    <button onclick="addToSKU('8')" style="padding: 15px; border: none; border-radius: 10px; font-size: 20px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">8</button>
+                                    <button onclick="addToSKU('9')" style="padding: 15px; border: none; border-radius: 10px; font-size: 20px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">9</button>
+                                    <button onclick="backspaceSKU()" style="padding: 15px; border: none; border-radius: 10px; font-size: 18px; font-weight: 700; cursor: pointer; background: #ef4444; color: white;">⌫</button>
+                                    <button onclick="addToSKU('0')" style="padding: 15px; border: none; border-radius: 10px; font-size: 20px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">0</button>
+                                    <button onclick="clearSKU()" style="padding: 15px; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; background: #f59e0b; color: white;">CLR</button>
+                                </div>
+                                
+                                <button id="btnCancelManual" style="width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #64748b; color: white;">✕ Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="startScanCountScreen">
+                    <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 16px;">
+                        <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 16px;">📷 Scan Count</h2>
+                        <p style="color: #64748b; margin-bottom: 20px; line-height: 1.6;">
+                            Use your phone camera to scan labels and count items. Perfect for random/unsorted inventory.
+                        </p>
+                        
+                        <div style="background: #dbeafe; padding: 14px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; color: #1e40af;">
+                            <strong>📱 iOS Tip:</strong> For best results, hold phone 6-12 inches from label in good lighting.
+                        </div>
+                        
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 600;">Session Name</label>
+                            <input type="text" id="scanSessionName" placeholder="e.g., Random Parts Count" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px;">
+                        </div>
+                        
+                        <button id="btnStartScanCount" style="padding: 16px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #10b981; color: white; width: 100%;">🚀 Start Scan Count</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="count-reports-tab" class="tab-content" style="display: none;">
+                <div style="background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 16px;">
+                    <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 12px;">Count Reports</h2>
+                    <p style="color: #64748b; margin-bottom: 16px;">View and export your physical count sessions</p>
+                    <div id="reportsCount" style="color: #64748b; font-size: 14px; font-weight: 600;">0 reports</div>
+                </div>
+                <div id="reportsList"></div>
+            </div>
+
+            <div id="import-export-tab" class="tab-content" style="display: none;">
+                <div style="background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                    <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 16px;">Import/Export</h2>
+                    <div style="background: #dbeafe; padding: 14px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; color: #1e40af;">
+                        <strong>CSV Format:</strong> SKU, Description, Qty, Min, Max, Location
+                    </div>
+                    <button id="btnImport" style="padding: 14px 20px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #3b82f6; color: white; margin-right: 8px;">📥 Import CSV</button>
+                    <input type="file" id="csvFile" accept=".csv" style="display: none;">
+                    <button id="btnExport2" style="padding: 14px 20px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #f59e0b; color: white;">📤 Export</button>
+                    <div style="margin-top: 20px;">
+                        <label style="display: block; margin-bottom: 6px; font-weight: 600;">Paste CSV Data:</label>
+                        <textarea id="csvPaste" rows="8" placeholder="Paste here..." style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px;"></textarea>
+                        <button id="btnImportPaste" style="padding: 14px 20px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #10b981; color: white; margin-top: 8px; width: 100%;">Import Pasted Data</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 9999;">
+        <div style="background: white; padding: 30px; border-radius: 12px; text-align: center;">
+            <div style="border: 4px solid #f3f4f6; border-top: 4px solid #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 12px;"></div>
+            <div id="loadingText">Loading...</div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #f8fafc; }
+        .menu-item:hover { background: #f5f5f5; }
+        .menu-item.active { background: #e0f2fe; color: #0369a1; border-left: 4px solid #0369a1; }
+    </style>
+
+    <script>
+        const SUPABASE_URL = 'https://jlsuylxlgjjiqyzuvgxi.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impsc3V5bHhsZ2pqaXF5enV2Z3hpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MTI4MjEsImV4cCI6MjA4NjQ4ODgyMX0.9RXnW7GWhTwYlrWFFJKWTzk2Yg8H4-44MlJnpdpbicc';
+        const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let inventory = [];
+        let selectedItems = new Set();
+        let countSessions = [];
+        let currentSession = null;
+        let currentItemIndex = 0;
+        let countedItems = [];
+        let scanCountSession = null;
+        let scanCountedItems = [];
+
+        // SKU Autocomplete
+        document.getElementById('sku').addEventListener('input', function(e) {
+            const value = e.target.value.toUpperCase();
+            const dropdown = document.getElementById('skuDropdown');
+            
+            if (value.length < 2) {
+                dropdown.style.display = 'none';
+                return;
+            }
+            
+            const matches = inventory.filter(item => 
+                item.sku.toUpperCase().includes(value)
+            ).slice(0, 10);
+            
+            if (matches.length === 0) {
+                dropdown.style.display = 'none';
+                return;
+            }
+            
+            let html = '';
+            matches.forEach(item => {
+                html += '<div style="padding: 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9;" onmouseover="this.style.background=\'#f8fafc\'" onmouseout="this.style.background=\'white\'" onclick="selectSKU(\'' + item.sku + '\')">';
+                html += '<div style="font-weight: 600; color: #1e293b;">' + item.sku + '</div>';
+                if (item.description) {
+                    html += '<div style="font-size: 13px; color: #64748b;">' + item.description + '</div>';
+                }
+                html += '<div style="font-size: 12px; color: #94a3b8; margin-top: 2px;">QOH: ' + (item.qtyOnHand || 0) + ' | Loc: ' + (item.location || '-') + '</div>';
+                html += '</div>';
+            });
+            
+            dropdown.innerHTML = html;
+            dropdown.style.display = 'block';
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#sku') && !e.target.closest('#skuDropdown')) {
+                document.getElementById('skuDropdown').style.display = 'none';
+            }
+        });
+        
+        function selectSKU(sku) {
+            const item = inventory.find(i => i.sku === sku);
+            if (!item) return;
+            
+            document.getElementById('sku').value = item.sku;
+            document.getElementById('description').value = item.description || '';
+            document.getElementById('qtyOnHand').value = item.qtyOnHand || 0;
+            document.getElementById('stockMin').value = item.stockMin || '';
+            document.getElementById('stockMax').value = item.stockMax || '';
+            document.getElementById('location').value = item.location || '';
+            document.getElementById('skuDropdown').style.display = 'none';
+        }
+
+        document.getElementById('menuBtn').addEventListener('click', function() {
+            const overlay = document.getElementById('menuOverlay');
+            const panel = document.getElementById('menuPanel');
+            const isOpen = overlay.style.display === 'block';
+            overlay.style.display = isOpen ? 'none' : 'block';
+            panel.style.transform = isOpen ? 'translateX(-100%)' : 'translateX(0)';
+        });
+
+        document.getElementById('menuOverlay').addEventListener('click', function() {
+            this.style.display = 'none';
+            document.getElementById('menuPanel').style.transform = 'translateX(-100%)';
+        });
+
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const tab = this.getAttribute('data-tab');
+                document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+                document.getElementById(tab + '-tab').style.display = 'block';
+                document.getElementById('menuOverlay').style.display = 'none';
+                document.getElementById('menuPanel').style.transform = 'translateX(-100%)';
+                if (tab === 'dashboard') updateDashboard();
+                if (tab === 'inventory') displayInventory();
+                if (tab === 'count-reports') displayCountReports();
+            });
+        });
+
+        document.getElementById('btnAddItem').addEventListener('click', () => {
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            document.querySelectorAll('.menu-item')[1].classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+            document.getElementById('add-edit-tab').style.display = 'block';
+        });
+
+        document.getElementById('btnSave').addEventListener('click', saveItem);
+        document.getElementById('btnClear').addEventListener('click', clearForm);
+        document.getElementById('btnExport').addEventListener('click', exportCSV);
+        document.getElementById('btnExport2').addEventListener('click', exportCSV);
+        document.getElementById('btnImport').addEventListener('click', () => document.getElementById('csvFile').click());
+        document.getElementById('csvFile').addEventListener('change', importCSV);
+        document.getElementById('btnImportPaste').addEventListener('click', importFromPaste);
+        document.getElementById('searchBox').addEventListener('input', displayInventory);
+        document.getElementById('btnDeleteSelected').addEventListener('click', deleteSelectedItems);
+
+        function showLoading(show, text = 'Loading...') {
+            document.getElementById('loading').style.display = show ? 'flex' : 'none';
+            document.getElementById('loadingText').textContent = text;
+        }
+
+        function showNotification(message, type = 'success') {
+            const notif = document.getElementById('notification');
+            notif.textContent = message;
+            notif.style.display = 'block';
+            notif.style.background = type === 'success' ? '#d1fae5' : '#fee2e2';
+            notif.style.color = type === 'success' ? '#065f46' : '#991b1b';
+            setTimeout(() => notif.style.display = 'none', 4000);
+        }
+
+        function updateDashboard() {
+            document.getElementById('statTotal').textContent = inventory.length;
+            document.getElementById('statLowStock').textContent = inventory.filter(i => i.qtyOnHand > 0 && i.stockMin && i.qtyOnHand <= i.stockMin).length;
+            document.getElementById('statOutStock').textContent = inventory.filter(i => i.qtyOnHand === 0).length;
+        }
+
+        async function loadInventory() {
+            try {
+                showLoading(true);
+                const { data, error } = await db.from('inventory').select('*').order('sku');
+                if (error) throw error;
+                inventory = (data || []).map(item => ({
+                    sku: item.sku,
+                    description: item.description,
+                    qtyOnHand: item.qty_on_hand,
+                    stockMin: item.stock_min,
+                    stockMax: item.stock_max,
+                    location: item.location
+                }));
+                updateDashboard();
+                displayInventory();
+            } catch (e) {
+                showNotification('Error: ' + e.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function saveItem() {
+            const sku = document.getElementById('sku').value.trim().toUpperCase();
+            if (!sku) return showNotification('Please enter SKU', 'error');
+            try {
+                showLoading(true);
+                const { error } = await db.from('inventory').upsert({
+                    sku,
+                    description: document.getElementById('description').value.trim(),
+                    qty_on_hand: parseInt(document.getElementById('qtyOnHand').value) || 0,
+                    stock_min: document.getElementById('stockMin').value ? parseInt(document.getElementById('stockMin').value) : null,
+                    stock_max: document.getElementById('stockMax').value ? parseInt(document.getElementById('stockMax').value) : null,
+                    location: document.getElementById('location').value.trim().toUpperCase(),
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'sku' });
+                if (error) throw error;
+                await loadInventory();
+                clearForm();
+                showNotification('Saved!');
+            } catch (e) {
+                showNotification('Error: ' + e.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('sku').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('qtyOnHand').value = '';
+            document.getElementById('stockMin').value = '';
+            document.getElementById('stockMax').value = '';
+            document.getElementById('location').value = '';
+        }
+
+        function displayInventory() {
+            const search = document.getElementById('searchBox').value.toLowerCase();
+            const filtered = inventory.filter(i => i.sku.toLowerCase().includes(search) || (i.description && i.description.toLowerCase().includes(search)));
+            document.getElementById('itemCount').textContent = filtered.length + ' items';
+            
+            const div = document.getElementById('inventoryTable');
+            if (filtered.length === 0) {
+                div.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 40px;">No items</p>';
+                document.getElementById('massDeleteControls').style.display = 'none';
+                return;
+            }
+            
+            let html = '<table style="width: 100%; border-collapse: collapse;"><thead><tr>';
+            html += '<th style="padding: 12px; text-align: left; background: #f8fafc; border-bottom: 2px solid #e2e8f0; width: 40px;"><input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)" style="cursor: pointer;"></th>';
+            html += '<th style="padding: 12px; text-align: left; background: #f8fafc; border-bottom: 2px solid #e2e8f0;">SKU</th>';
+            html += '<th style="padding: 12px; text-align: left; background: #f8fafc; border-bottom: 2px solid #e2e8f0;">Description</th>';
+            html += '<th style="padding: 12px; text-align: left; background: #f8fafc; border-bottom: 2px solid #e2e8f0;">QOH</th>';
+            html += '<th style="padding: 12px; text-align: left; background: #f8fafc; border-bottom: 2px solid #e2e8f0;">Location</th>';
+            html += '<th style="padding: 12px; text-align: left; background: #f8fafc; border-bottom: 2px solid #e2e8f0;">Actions</th>';
+            html += '</tr></thead><tbody>';
+            
+            filtered.forEach(item => {
+                const isSelected = selectedItems.has(item.sku);
+                html += '<tr>';
+                html += '<td style="padding: 12px; border-bottom: 1px solid #f1f5f9;"><input type="checkbox" class="item-checkbox" data-sku="' + item.sku + '" ' + (isSelected ? 'checked' : '') + ' onchange="toggleItemSelection(\'' + item.sku + '\', this.checked)" style="cursor: pointer;"></td>';
+                html += '<td style="padding: 12px; border-bottom: 1px solid #f1f5f9;"><strong>' + item.sku + '</strong></td>';
+                html += '<td style="padding: 12px; border-bottom: 1px solid #f1f5f9;">' + (item.description || '-') + '</td>';
+                html += '<td style="padding: 12px; border-bottom: 1px solid #f1f5f9; font-weight: 600;">' + (item.qtyOnHand || 0) + '</td>';
+                html += '<td style="padding: 12px; border-bottom: 1px solid #f1f5f9;">' + (item.location || '-') + '</td>';
+                html += '<td style="padding: 12px; border-bottom: 1px solid #f1f5f9;"><button onclick="editItem(\'' + item.sku + '\')" style="padding: 6px 12px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; margin-right: 4px;">Edit</button>';
+                html += '<button onclick="deleteItem(\'' + item.sku + '\')" style="padding: 6px 12px; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer;">Del</button></td>';
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            div.innerHTML = html;
+            updateMassDeleteControls();
+        }
+        
+        function toggleSelectAll(checked) {
+            selectedItems.clear();
+            if (checked) {
+                const search = document.getElementById('searchBox').value.toLowerCase();
+                const filtered = inventory.filter(i => i.sku.toLowerCase().includes(search) || (i.description && i.description.toLowerCase().includes(search)));
+                filtered.forEach(item => selectedItems.add(item.sku));
+            }
+            displayInventory();
+        }
+        
+        function toggleItemSelection(sku, checked) {
+            if (checked) {
+                selectedItems.add(sku);
+            } else {
+                selectedItems.delete(sku);
+            }
+            updateMassDeleteControls();
+        }
+        
+        function updateMassDeleteControls() {
+            const controls = document.getElementById('massDeleteControls');
+            const countSpan = document.getElementById('selectedCount');
+            
+            if (selectedItems.size > 0) {
+                controls.style.display = 'block';
+                countSpan.textContent = selectedItems.size;
+            } else {
+                controls.style.display = 'none';
+            }
+        }
+        
+        async function deleteSelectedItems() {
+            if (selectedItems.size === 0) return;
+            
+            const count = selectedItems.size;
+            if (!confirm('Delete ' + count + ' selected item' + (count > 1 ? 's' : '') + '?')) return;
+            
+            try {
+                showLoading(true, 'Deleting ' + count + ' items...');
+                
+                const skusToDelete = Array.from(selectedItems);
+                const { error } = await db.from('inventory').delete().in('sku', skusToDelete);
+                
+                if (error) throw error;
+                
+                selectedItems.clear();
+                await loadInventory();
+                showNotification('Deleted ' + count + ' items');
+            } catch (e) {
+                showNotification('Error: ' + e.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function editItem(sku) {
+            const item = inventory.find(i => i.sku === sku);
+            if (!item) return;
+            document.getElementById('sku').value = item.sku;
+            document.getElementById('description').value = item.description || '';
+            document.getElementById('qtyOnHand').value = item.qtyOnHand || 0;
+            document.getElementById('stockMin').value = item.stockMin || '';
+            document.getElementById('stockMax').value = item.stockMax || '';
+            document.getElementById('location').value = item.location || '';
+            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+            document.getElementById('add-edit-tab').style.display = 'block';
+        }
+
+        async function deleteItem(sku) {
+            if (!confirm('Delete ' + sku + '?')) return;
+            try {
+                showLoading(true);
+                const { error } = await db.from('inventory').delete().eq('sku', sku);
+                if (error) throw error;
+                await loadInventory();
+                showNotification('Deleted');
+            } catch (e) {
+                showNotification('Error: ' + e.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function importCSV(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (e) => await processCSV(e.target.result);
+            reader.readAsText(file);
+        }
+
+        async function importFromPaste() {
+            const text = document.getElementById('csvPaste').value.trim();
+            if (!text) return showNotification('Paste CSV first', 'error');
+            await processCSV(text);
+            document.getElementById('csvPaste').value = '';
+        }
+
+        async function processCSV(text) {
+            try {
+                showLoading(true);
+                const lines = text.trim().split('\n');
+                const items = [];
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line || (i === 0 && line.toLowerCase().includes('sku'))) continue;
+                    const parts = line.split(',').map(p => p.trim().replace(/^["']|["']$/g, ''));
+                    if (parts.length < 3) continue;
+                    const sku = parts[0].toUpperCase();
+                    if (!sku) continue;
+                    items.push({
+                        sku,
+                        description: parts[1] || '',
+                        qty_on_hand: parseInt(parts[2]) || 0,
+                        stock_min: parts[3] ? parseInt(parts[3]) : null,
+                        stock_max: parts[4] ? parseInt(parts[4]) : null,
+                        location: parts[5] ? parts[5].toUpperCase() : '',
+                        updated_at: new Date().toISOString()
+                    });
+                }
+                if (items.length === 0) return showNotification('No valid items', 'error');
+                const { error } = await db.from('inventory').upsert(items, { onConflict: 'sku' });
+                if (error) throw error;
+                await loadInventory();
+                showNotification('Imported ' + items.length + ' items!');
+            } catch (e) {
+                showNotification('Error: ' + e.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function exportCSV() {
+            if (inventory.length === 0) return showNotification('No items', 'error');
+            let csv = 'SKU,Description,Qty on Hand,Min,Max,Location\n';
+            inventory.forEach(i => {
+                csv += '"' + i.sku + '","' + (i.description || '') + '",' + (i.qtyOnHand || 0) + ',' + (i.stockMin || '') + ',' + (i.stockMax || '') + ',"' + (i.location || '') + '"\n';
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'inventory_' + new Date().toISOString().slice(0,10) + '.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+            showNotification('Exported ' + inventory.length + ' items');
+        }
+
+        // Physical Count Functions
+        document.getElementById('btnStartCount').addEventListener('click', startCountSession);
+        document.getElementById('btnSaveCount').addEventListener('click', saveCurrentCount);
+        document.getElementById('btnSkipItem').addEventListener('click', skipCurrentItem);
+        document.getElementById('btnPrevItem').addEventListener('click', previousItem);
+        document.getElementById('btnFinishCount').addEventListener('click', finishCountSession);
+        document.getElementById('btnMinus').addEventListener('click', () => {
+            const input = document.getElementById('actualCount');
+            const val = parseInt(input.value) || 0;
+            if (val > 0) input.value = val - 1;
+            updateVarianceDisplay();
+        });
+        document.getElementById('btnPlus').addEventListener('click', () => {
+            const input = document.getElementById('actualCount');
+            input.value = (parseInt(input.value) || 0) + 1;
+            updateVarianceDisplay();
+        });
+        document.getElementById('actualCount').addEventListener('input', updateVarianceDisplay);
+        
+        // Make input editable when tapped
+        document.getElementById('actualCount').addEventListener('click', function() {
+            this.removeAttribute('readonly');
+            this.select();
+        });
+        
+        // Make readonly again after blur to prevent accidental keyboard opening
+        document.getElementById('actualCount').addEventListener('blur', function() {
+            this.setAttribute('readonly', 'readonly');
+        });
+        
+        function startCountSession() {
+            const sessionName = document.getElementById('sessionNameInput').value.trim() || 'Count Session';
+            const sortOrder = document.getElementById('countSortOrder').value;
+            const locationFilter = document.getElementById('locationFilter').value.trim().toUpperCase();
+            
+            let itemsToCount = [...inventory];
+            
+            if (locationFilter) {
+                itemsToCount = itemsToCount.filter(item => 
+                    item.location && item.location.toUpperCase().startsWith(locationFilter)
+                );
+            }
+            
+            if (itemsToCount.length === 0) {
+                showNotification('No items match the filter', 'error');
+                return;
+            }
+            
+            if (sortOrder === 'location') {
+                itemsToCount.sort((a, b) => (a.location || '').localeCompare(b.location || ''));
+            } else {
+                itemsToCount.sort((a, b) => a.sku.localeCompare(b.sku));
+            }
+            
+            currentSession = {
+                id: Date.now(),
+                name: sessionName,
+                startTime: new Date().toISOString(),
+                sortOrder: sortOrder === 'location' ? 'Location' : 'SKU',
+                locationFilter: locationFilter || 'All',
+                items: itemsToCount.map(item => ({
+                    sku: item.sku,
+                    description: item.description,
+                    location: item.location,
+                    systemQty: item.qtyOnHand,
+                    actualQty: null,
+                    variance: null,
+                    counted: false
+                }))
+            };
+            
+            currentItemIndex = 0;
+            countedItems = [];
+            
+            document.getElementById('startCountScreen').style.display = 'none';
+            document.getElementById('countSession').style.display = 'block';
+            document.getElementById('sessionName').textContent = sessionName;
+            document.getElementById('sortMethod').textContent = currentSession.sortOrder;
+            
+            displayCurrentItem();
+        }
+        
+        function displayCurrentItem() {
+            if (!currentSession || currentItemIndex >= currentSession.items.length) {
+                finishCountSession();
+                return;
+            }
+            
+            const item = currentSession.items[currentItemIndex];
+            const counted = countedItems.filter(i => i.counted).length;
+            
+            document.getElementById('countProgress').textContent = counted + '/' + currentSession.items.length;
+            document.getElementById('countSKU').textContent = item.sku;
+            document.getElementById('countDescription').textContent = item.description || '-';
+            document.getElementById('countLocation').textContent = item.location || '-';
+            document.getElementById('systemQty').textContent = item.systemQty || 0;
+            
+            const actualInput = document.getElementById('actualCount');
+            if (item.actualQty !== null) {
+                actualInput.value = item.actualQty;
+            } else {
+                actualInput.value = item.systemQty || 0;
+            }
+            
+            updateVarianceDisplay();
+            
+            document.getElementById('btnPrevItem').disabled = currentItemIndex === 0;
+            document.getElementById('btnPrevItem').style.opacity = currentItemIndex === 0 ? '0.5' : '1';
+        }
+        
+        function updateVarianceDisplay() {
+            const systemQty = parseInt(document.getElementById('systemQty').textContent) || 0;
+            const actualQty = parseInt(document.getElementById('actualCount').value) || 0;
+            const variance = actualQty - systemQty;
+            const display = document.getElementById('varianceDisplay');
+            
+            if (variance === 0) {
+                display.style.display = 'none';
+            } else {
+                display.style.display = 'block';
+                display.textContent = 'Variance: ' + (variance > 0 ? '+' : '') + variance;
+                display.style.background = variance > 0 ? '#dbeafe' : '#fef3c7';
+                display.style.color = variance > 0 ? '#1e40af' : '#92400e';
+            }
+        }
+        
+        async function saveCurrentCount() {
+            const item = currentSession.items[currentItemIndex];
+            const actualQty = parseInt(document.getElementById('actualCount').value) || 0;
+            
+            item.actualQty = actualQty;
+            item.variance = actualQty - (item.systemQty || 0);
+            item.counted = true;
+            item.countedAt = new Date().toISOString();
+            
+            if (item.variance !== 0) {
+                try {
+                    await db.from('inventory').update({
+                        qty_on_hand: actualQty,
+                        updated_at: new Date().toISOString()
+                    }).eq('sku', item.sku);
+                    
+                    const invItem = inventory.find(i => i.sku === item.sku);
+                    if (invItem) invItem.qtyOnHand = actualQty;
+                } catch (e) {
+                    showNotification('Error updating: ' + e.message, 'error');
+                }
+            }
+            
+            currentItemIndex++;
+            displayCurrentItem();
+        }
+        
+        function skipCurrentItem() {
+            currentItemIndex++;
+            displayCurrentItem();
+        }
+        
+        function previousItem() {
+            if (currentItemIndex > 0) {
+                currentItemIndex--;
+                displayCurrentItem();
+            }
+        }
+        
+        async function finishCountSession() {
+            if (!currentSession) return;
+            
+            currentSession.endTime = new Date().toISOString();
+            currentSession.completed = true;
+            
+            const counted = currentSession.items.filter(i => i.counted).length;
+            const withVariance = currentSession.items.filter(i => i.counted && i.variance !== 0).length;
+            
+            currentSession.summary = {
+                totalItems: currentSession.items.length,
+                counted: counted,
+                withVariance: withVariance
+            };
+            
+            countSessions.push(currentSession);
+            localStorage.setItem('countSessions', JSON.stringify(countSessions));
+            
+            document.getElementById('countSession').style.display = 'none';
+            document.getElementById('startCountScreen').style.display = 'block';
+            document.getElementById('sessionNameInput').value = '';
+            document.getElementById('locationFilter').value = '';
+            
+            showNotification('Count session completed! ' + counted + ' items counted, ' + withVariance + ' with changes');
+            
+            currentSession = null;
+            await loadInventory();
+        }
+        
+        function displayCountReports() {
+            const savedSessions = localStorage.getItem('countSessions');
+            if (savedSessions) {
+                countSessions = JSON.parse(savedSessions);
+            }
+            
+            document.getElementById('reportsCount').textContent = countSessions.length + ' report' + (countSessions.length !== 1 ? 's' : '');
+            
+            const listDiv = document.getElementById('reportsList');
+            if (countSessions.length === 0) {
+                listDiv.innerHTML = '<div style="text-align: center; padding: 60px 20px; color: #94a3b8;">No count sessions yet</div>';
+                return;
+            }
+            
+            let html = '';
+            countSessions.slice().reverse().forEach((session, index) => {
+                const realIndex = countSessions.length - 1 - index;
+                html += '<div style="background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 16px;">';
+                html += '<div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">';
+                html += '<div><h3 style="font-size: 16px; font-weight: 600; margin-bottom: 4px;">' + session.name + '</h3>';
+                html += '<div style="font-size: 13px; color: #64748b;">' + new Date(session.startTime).toLocaleString() + '</div></div>';
+                html += '<span style="padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; background: #d1fae5; color: #065f46;">COMPLETED</span>';
+                html += '</div>';
+                html += '<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px;">';
+                html += '<div style="text-align: center; padding: 8px; background: #f8fafc; border-radius: 6px;"><div style="font-size: 18px; font-weight: 700;">' + session.summary.totalItems + '</div><div style="font-size: 12px; color: #64748b;">Total</div></div>';
+                html += '<div style="text-align: center; padding: 8px; background: #f8fafc; border-radius: 6px;"><div style="font-size: 18px; font-weight: 700;">' + session.summary.counted + '</div><div style="font-size: 12px; color: #64748b;">Counted</div></div>';
+                html += '<div style="text-align: center; padding: 8px; background: #f8fafc; border-radius: 6px;"><div style="font-size: 18px; font-weight: 700; color: #f59e0b;">' + session.summary.withVariance + '</div><div style="font-size: 12px; color: #64748b;">Changed</div></div>';
+                html += '</div>';
+                html += '<div style="font-size: 13px; color: #64748b; margin-bottom: 12px;">Sorted by: ' + session.sortOrder + ' | Filter: ' + session.locationFilter + '</div>';
+                html += '<button onclick="exportCountSession(' + realIndex + ')" style="padding: 10px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; background: #3b82f6; color: white; margin-right: 8px;">📥 Export CSV</button>';
+                html += '<button onclick="viewCountDetails(' + realIndex + ')" style="padding: 10px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; background: #64748b; color: white;">👁️ View Details</button>';
+                html += '</div>';
+            });
+            
+            listDiv.innerHTML = html;
+        }
+        
+        function exportCountSession(index) {
+            const session = countSessions[index];
+            let csv = 'Physical Count Report\n';
+            csv += 'Session: ' + session.name + '\n';
+            csv += 'Date: ' + new Date(session.startTime).toLocaleString() + '\n';
+            csv += 'Sort Order: ' + session.sortOrder + '\n';
+            csv += 'Location Filter: ' + session.locationFilter + '\n\n';
+            csv += 'SKU,Description,Location,System Qty,Actual Qty,Variance,Counted At\n';
+            
+            session.items.forEach(item => {
+                if (item.counted) {
+                    csv += '"' + item.sku + '","' + (item.description || '') + '","' + (item.location || '') + '",';
+                    csv += (item.systemQty || 0) + ',' + (item.actualQty || 0) + ',' + (item.variance || 0) + ',';
+                    csv += '"' + (item.countedAt ? new Date(item.countedAt).toLocaleString() : '') + '"\n';
+                }
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Count_' + session.name.replace(/\s+/g, '_') + '_' + new Date(session.startTime).toISOString().slice(0,10) + '.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+            showNotification('Report exported');
+        }
+        
+        function viewCountDetails(index) {
+            const session = countSessions[index];
+            alert('Session: ' + session.name + '\n\nTotal Items: ' + session.summary.totalItems + '\nCounted: ' + session.summary.counted + '\nWith Changes: ' + session.summary.withVariance + '\n\nUse Export CSV to get full details for QuickBooks.');
+        }
+
+        // Scan Count Functions
+        document.getElementById('btnStartScanCount').addEventListener('click', startScanCountSession);
+        document.getElementById('btnTakePicture').addEventListener('click', () => document.getElementById('cameraInput').click());
+        document.getElementById('cameraInput').addEventListener('change', handlePhotoCapture);
+        document.getElementById('btnManualSearch').addEventListener('click', showManualSearch);
+        document.getElementById('btnCancelManual').addEventListener('click', hideManualSearch);
+        document.getElementById('btnRescan').addEventListener('click', showScanCamera);
+        document.getElementById('btnSaveScanCount').addEventListener('click', saveScanCount);
+        document.getElementById('btnCancelScan').addEventListener('click', cancelScanCount);
+        document.getElementById('btnFinishScanCount').addEventListener('click', finishScanCountSession);
+        
+        document.getElementById('btnScanMinus').addEventListener('click', () => {
+            const input = document.getElementById('scanActualCount');
+            const val = parseInt(input.value) || 0;
+            if (val > 0) input.value = val - 1;
+            updateScanVarianceDisplay();
+        });
+        
+        document.getElementById('btnScanPlus').addEventListener('click', () => {
+            const input = document.getElementById('scanActualCount');
+            input.value = (parseInt(input.value) || 0) + 1;
+            updateScanVarianceDisplay();
+        });
+        
+        document.getElementById('scanActualCount').addEventListener('input', updateScanVarianceDisplay);
+        document.getElementById('scanActualCount').addEventListener('click', function() {
+            this.removeAttribute('readonly');
+            this.select();
+        });
+        document.getElementById('scanActualCount').addEventListener('blur', function() {
+            this.setAttribute('readonly', 'readonly');
+        });
+        
+        // On-screen keyboard for manual SKU entry
+        let currentSKUInput = '';
+        
+        function addToSKU(char) {
+            currentSKUInput += char;
+            updateSKUDisplay();
+            checkForMatches();
+        }
+        
+        function backspaceSKU() {
+            currentSKUInput = currentSKUInput.slice(0, -1);
+            updateSKUDisplay();
+            checkForMatches();
+        }
+        
+        function clearSKU() {
+            currentSKUInput = '';
+            updateSKUDisplay();
+            document.getElementById('quickMatchDropdown').style.display = 'none';
+        }
+        
+        function updateSKUDisplay() {
+            document.getElementById('skuTyped').textContent = currentSKUInput || '';
+        }
+        
+        function checkForMatches() {
+            const dropdown = document.getElementById('quickMatchDropdown');
+            
+            if (currentSKUInput.length < 2) {
+                dropdown.style.display = 'none';
+                return;
+            }
+            
+            const matches = inventory.filter(item => 
+                item.sku.toUpperCase().includes(currentSKUInput.toUpperCase())
+            ).slice(0, 5);
+            
+            if (matches.length === 0) {
+                dropdown.style.display = 'none';
+                return;
+            }
+            
+            let html = '<div style="background: #f8fafc; padding: 8px; border-radius: 8px; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: #64748b;">Quick Matches:</div>';
+            matches.forEach(item => {
+                html += '<div style="padding: 12px; background: white; border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 8px; cursor: pointer;" onclick="selectQuickMatch(\'' + item.sku + '\')">';
+                html += '<div style="font-weight: 700; color: #1e293b; margin-bottom: 4px;">' + item.sku + '</div>';
+                if (item.description) html += '<div style="font-size: 13px; color: #64748b;">' + item.description + '</div>';
+                html += '</div>';
+            });
+            
+            dropdown.innerHTML = html;
+            dropdown.style.display = 'block';
+        }
+        
+        function selectQuickMatch(sku) {
+            const item = inventory.find(i => i.sku === sku);
+            if (item) {
+                currentSKUInput = '';
+                document.getElementById('quickMatchDropdown').style.display = 'none';
+                hideManualSearch();
+                loadScanItem(item);
+            }
+        }
+        
+        // Manual SKU input with autocomplete (old method - keeping as backup)
+        document.getElementById('manualSKUInput') && document.getElementById('manualSKUInput').addEventListener('input', function(e) {
+            const value = e.target.value.toUpperCase();
+            const dropdown = document.getElementById('manualSKUDropdown');
+            
+            if (value.length < 2) {
+                dropdown.style.display = 'none';
+                return;
+            }
+            
+            const matches = inventory.filter(item => 
+                item.sku.toUpperCase().includes(value)
+            ).slice(0, 10);
+            
+            if (matches.length === 0) {
+                dropdown.style.display = 'none';
+                return;
+            }
+            
+            let html = '';
+            matches.forEach(item => {
+                html += '<div style="padding: 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9;" onclick="selectManualSKU(\'' + item.sku + '\')">';
+                html += '<div style="font-weight: 600;">' + item.sku + '</div>';
+                if (item.description) html += '<div style="font-size: 13px; color: #64748b;">' + item.description + '</div>';
+                html += '</div>';
+            });
+            
+            dropdown.innerHTML = html;
+            dropdown.style.display = 'block';
+        });
+        
+        function selectManualSKU(sku) {
+            const item = inventory.find(i => i.sku === sku);
+            if (item) {
+                document.getElementById('manualSKUDropdown').style.display = 'none';
+                document.getElementById('manualSKUInput').value = '';
+                hideManualSearch();
+                loadScanItem(item);
+            }
+        }
+        
+        function startScanCountSession() {
+            const sessionName = document.getElementById('scanSessionName').value.trim() || 'Scan Count Session';
+            
+            scanCountSession = {
+                id: Date.now(),
+                name: sessionName,
+                startTime: new Date().toISOString(),
+                items: []
+            };
+            
+            scanCountedItems = [];
+            
+            document.getElementById('startScanCountScreen').style.display = 'none';
+            document.getElementById('scanCountSession').style.display = 'block';
+            updateScanProgress();
+            showScanCamera();
+        }
+        
+        function showScanCamera() {
+            document.getElementById('scanCameraScreen').style.display = 'block';
+            document.getElementById('skuPickerScreen').style.display = 'none';
+            document.getElementById('scanItemCard').style.display = 'none';
+        }
+        
+        function showManualSearch() {
+            document.getElementById('manualSearchScreen').style.display = 'block';
+            document.getElementById('scanCameraScreen').style.display = 'none';
+            document.getElementById('manualSKUInput').focus();
+        }
+        
+        function hideManualSearch() {
+            currentSKUInput = '';
+            updateSKUDisplay();
+            document.getElementById('quickMatchDropdown').style.display = 'none';
+            document.getElementById('manualSearchScreen').style.display = 'none';
+            document.getElementById('scanCameraScreen').style.display = 'block';
+        }
+        
+        async function handlePhotoCapture(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            console.log('Photo captured, starting OCR...');
+            
+            // Show loading
+            const cameraScreen = document.getElementById('scanCameraScreen');
+            cameraScreen.innerHTML = '<div style="background: white; padding: 40px; border-radius: 12px; text-align: center;"><div style="border: 4px solid #f3f4f6; border-top: 4px solid #3b82f6; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 16px;"></div><div style="font-weight: 600; color: #1e293b; margin-bottom: 8px;">Reading label...</div><div style="font-size: 14px; color: #64748b;" id="ocrProgress">Initializing OCR...</div></div>';
+            
+            try {
+                // Check if Tesseract is loaded
+                if (typeof Tesseract === 'undefined') {
+                    throw new Error('OCR library not loaded. Please refresh the page.');
+                }
+                
+                document.getElementById('ocrProgress').textContent = 'Processing image...';
+                
+                const result = await Tesseract.recognize(file, 'eng', {
+                    logger: (m) => {
+                        console.log(m);
+                        if (m.status === 'recognizing text') {
+                            const percent = Math.round(m.progress * 100);
+                            document.getElementById('ocrProgress').textContent = 'Reading: ' + percent + '%';
+                        }
+                    }
+                });
+                
+                console.log('OCR complete. Raw text:', result.data.text);
+                
+                const text = result.data.text;
+                const detectedSKUs = extractSKUs(text);
+                
+                console.log('Detected SKUs:', detectedSKUs);
+                
+                // Reset camera screen
+                resetCameraScreen();
+                
+                if (detectedSKUs.length === 0) {
+                    // Show what was detected for debugging
+                    alert('No matching SKUs found.\n\nDetected text:\n' + text.substring(0, 200) + '\n\nTry:\n- Get closer to label\n- Better lighting\n- Or type manually');
+                    return;
+                }
+                
+                if (detectedSKUs.length === 1) {
+                    // Auto-load single match
+                    const item = inventory.find(i => i.sku === detectedSKUs[0]);
+                    if (item) {
+                        loadScanItem(item);
+                    } else {
+                        showNotification('SKU ' + detectedSKUs[0] + ' not found in inventory', 'error');
+                    }
+                } else {
+                    // Show picker for multiple matches
+                    showSKUPicker(detectedSKUs);
+                }
+            } catch (error) {
+                console.error('OCR Error:', error);
+                resetCameraScreen();
+                alert('Error processing image:\n\n' + error.message + '\n\nPlease try again or type manually.');
+            }
+        }
+        
+        function resetCameraScreen() {
+            const cameraScreen = document.getElementById('scanCameraScreen');
+            cameraScreen.innerHTML = '<div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;"><div style="font-size: 48px; margin-bottom: 16px;">📷</div><h3 style="font-size: 20px; font-weight: 600; margin-bottom: 12px;">Scan Item Label</h3><p style="color: #64748b; margin-bottom: 20px;">Point camera at SKU/Part Number</p><input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;"><button id="btnTakePicture" style="width: 100%; padding: 20px; border: none; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white; margin-bottom: 12px;">📸 Take Picture</button><button id="btnManualSearch" style="width: 100%; padding: 16px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #f1f5f9; color: #64748b;">⌨️ Type SKU Manually</button></div>';
+            document.getElementById('btnTakePicture').addEventListener('click', () => document.getElementById('cameraInput').click());
+            document.getElementById('cameraInput').addEventListener('change', handlePhotoCapture);
+            document.getElementById('btnManualSearch').addEventListener('click', showManualSearch);
+        }
+        
+        function extractSKUs(text) {
+            const skus = [];
+            const lines = text.split('\n');
+            
+            // Pattern matching for common SKU formats
+            const patterns = [
+                /\b(MW\d{4}-\d{4}-[A-Z]{3})\b/gi,  // MW2018-7615-BSK
+                /\b(GH\d{3}[A-Z]-\d{3})\b/gi,      // GH123A-456
+                /\b(P\d{6})\b/gi,                  // P165789
+                /\b(\d{4}-\d{4}-[A-Z]{3})\b/gi,    // 2018-7615-BSK
+                /\b([A-Z]{2}\d{4,8})\b/gi          // MW20187615
+            ];
+            
+            patterns.forEach(pattern => {
+                const matches = text.match(pattern);
+                if (matches) {
+                    matches.forEach(match => {
+                        const normalized = match.toUpperCase();
+                        // Check if this SKU exists in inventory
+                        if (inventory.find(i => i.sku === normalized)) {
+                            if (!skus.includes(normalized)) {
+                                skus.push(normalized);
+                            }
+                        }
+                    });
+                }
+            });
+            
+            return skus;
+        }
+        
+        function showSKUPicker(detectedSKUs) {
+            document.getElementById('scanCameraScreen').style.display = 'none';
+            document.getElementById('skuPickerScreen').style.display = 'block';
+            
+            const container = document.getElementById('detectedSKUs');
+            let html = '';
+            
+            detectedSKUs.forEach(sku => {
+                const item = inventory.find(i => i.sku === sku);
+                if (item) {
+                    html += '<div style="padding: 16px; border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 12px; cursor: pointer;" onclick="selectDetectedSKU(\'' + sku + '\')">';
+                    html += '<div style="font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 4px;">' + sku + '</div>';
+                    if (item.description) html += '<div style="font-size: 14px; color: #64748b; margin-bottom: 4px;">' + item.description + '</div>';
+                    html += '<div style="font-size: 13px; color: #94a3b8;">QOH: ' + (item.qtyOnHand || 0) + ' | Loc: ' + (item.location || '-') + '</div>';
+                    html += '</div>';
+                }
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        function selectDetectedSKU(sku) {
+            const item = inventory.find(i => i.sku === sku);
+            if (item) {
+                loadScanItem(item);
+            }
+        }
+        
+        function loadScanItem(item) {
+            document.getElementById('scanCameraScreen').style.display = 'none';
+            document.getElementById('skuPickerScreen').style.display = 'none';
+            document.getElementById('scanItemCard').style.display = 'block';
+            
+            document.getElementById('scanSKU').textContent = item.sku;
+            document.getElementById('scanDescription').textContent = item.description || '-';
+            document.getElementById('scanLocation').textContent = item.location || '-';
+            document.getElementById('scanSystemQty').textContent = item.qtyOnHand || 0;
+            document.getElementById('scanActualCount').value = item.qtyOnHand || 0;
+            
+            updateScanVarianceDisplay();
+        }
+        
+        function updateScanVarianceDisplay() {
+            const systemQty = parseInt(document.getElementById('scanSystemQty').textContent) || 0;
+            const actualQty = parseInt(document.getElementById('scanActualCount').value) || 0;
+            const variance = actualQty - systemQty;
+            const display = document.getElementById('scanVarianceDisplay');
+            
+            if (variance === 0) {
+                display.style.display = 'none';
+            } else {
+                display.style.display = 'block';
+                display.textContent = 'Variance: ' + (variance > 0 ? '+' : '') + variance;
+                display.style.background = variance > 0 ? '#dbeafe' : '#fef3c7';
+                display.style.color = variance > 0 ? '#1e40af' : '#92400e';
+            }
+        }
+        
+        async function saveScanCount() {
+            const sku = document.getElementById('scanSKU').textContent;
+            const actualQty = parseInt(document.getElementById('scanActualCount').value) || 0;
+            const systemQty = parseInt(document.getElementById('scanSystemQty').textContent) || 0;
+            const variance = actualQty - systemQty;
+            
+            const item = inventory.find(i => i.sku === sku);
+            if (!item) return;
+            
+            const countRecord = {
+                sku: sku,
+                description: item.description,
+                location: item.location,
+                systemQty: systemQty,
+                actualQty: actualQty,
+                variance: variance,
+                countedAt: new Date().toISOString()
+            };
+            
+            scanCountSession.items.push(countRecord);
+            scanCountedItems.push(sku);
+            
+            if (variance !== 0) {
+                try {
+                    await db.from('inventory').update({
+                        qty_on_hand: actualQty,
+                        updated_at: new Date().toISOString()
+                    }).eq('sku', sku);
+                    
+                    item.qtyOnHand = actualQty;
+                } catch (e) {
+                    showNotification('Error updating: ' + e.message, 'error');
+                }
+            }
+            
+            updateScanProgress();
+            showScanCamera();
+            showNotification('Saved! Count: ' + scanCountedItems.length);
+        }
+        
+        function cancelScanCount() {
+            showScanCamera();
+        }
+        
+        function updateScanProgress() {
+            document.getElementById('scanProgress').textContent = scanCountedItems.length;
+        }
+        
+        async function finishScanCountSession() {
+            if (!scanCountSession || scanCountSession.items.length === 0) {
+                showNotification('No items counted', 'error');
+                return;
+            }
+            
+            scanCountSession.endTime = new Date().toISOString();
+            scanCountSession.completed = true;
+            
+            const withVariance = scanCountSession.items.filter(i => i.variance !== 0).length;
+            
+            scanCountSession.summary = {
+                totalItems: scanCountSession.items.length,
+                counted: scanCountSession.items.length,
+                withVariance: withVariance
+            };
+            
+            countSessions.push(scanCountSession);
+            localStorage.setItem('countSessions', JSON.stringify(countSessions));
+            
+            document.getElementById('scanCountSession').style.display = 'none';
+            document.getElementById('startScanCountScreen').style.display = 'block';
+            document.getElementById('scanSessionName').value = '';
+            
+            showNotification('Scan count completed! ' + scanCountSession.items.length + ' items counted, ' + withVariance + ' with changes');
+            
+            scanCountSession = null;
+            scanCountedItems = [];
+            await loadInventory();
+        }
+
+        loadInventory();
+    </script>
+</body>
+</html>
