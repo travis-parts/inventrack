@@ -36,15 +36,16 @@ A mobile-first, cloud-based inventory management system built for warehouse oper
 - **Frontend:** Pure HTML/CSS/JavaScript (no frameworks)
 - **Database:** Supabase (PostgreSQL)
 - **OCR:** Tesseract.js
-- **Hosting:** Netlify (or any static host)
+- **Hosting:** GitHub Pages (free, HTTPS included)
 - **PWA:** Install as mobile app
+- **Version Control:** Git/GitHub
 
 ## 📋 Requirements
 
 - **Supabase Account** (free tier works)
-- **Netlify Account** (free tier works)
+- **GitHub Account** (free)
 - **Modern Browser** (Chrome, Safari, Firefox)
-- **HTTPS** (required for camera access)
+- **HTTPS** (GitHub Pages provides automatically)
 
 ## 🚀 Quick Start
 
@@ -95,31 +96,28 @@ const SUPABASE_KEY = 'YOUR_ANON_KEY';
 ```
 3. Replace with your credentials
 
-### 3. Deploy
+### 3. Deploy to GitHub Pages
 
-**Option A: Netlify (Recommended)**
-1. Go to [app.netlify.com/drop](https://app.netlify.com/drop)
-2. Drag and drop `index.html`
-3. Done! You get a URL like `https://your-site.netlify.app`
+1. Create a GitHub account at [github.com](https://github.com)
+2. Create new repository named `inventtrack-pro` (or any name)
+3. Upload all files to the repository
+4. Go to repository Settings → Pages
+5. Under "Source", select `main` branch
+6. Click "Save"
+7. Wait 1-2 minutes
+8. Your site is live at: `https://YOUR_USERNAME.github.io/inventtrack-pro/`
 
-**Option B: GitHub + Netlify Auto-Deploy**
-1. Push this repo to GitHub
-2. Connect Netlify to your GitHub repo
-3. Auto-deploys on every push
-
-**Option C: Any Static Host**
-- Vercel, GitHub Pages, Cloudflare Pages, etc.
-- Just upload `index.html`
+**That's it!** No build process, no separate hosting service needed.
 
 ### 4. Install as PWA (Mobile)
 
 **iPhone:**
-1. Open site in Safari
+1. Open your GitHub Pages URL in Safari
 2. Tap Share button
 3. "Add to Home Screen"
 
 **Android:**
-1. Open site in Chrome
+1. Open your GitHub Pages URL in Chrome
 2. Tap menu (⋮)
 3. "Install app"
 
@@ -174,7 +172,7 @@ Perfect for importing into:
 ## 🐛 Troubleshooting
 
 **Camera not working:**
-- Must be HTTPS (Netlify provides this)
+- GitHub Pages provides HTTPS automatically ✅
 - Grant camera permission in browser
 - iOS: Settings → Safari → Camera access
 
@@ -185,9 +183,14 @@ Perfect for importing into:
 - Use manual entry as fallback
 
 **Database connection errors:**
-- Check Supabase credentials
+- Check Supabase credentials in `index.html`
 - Verify RLS policies are enabled
 - Check browser console for errors
+
+**Site not loading:**
+- Wait 1-2 minutes after enabling GitHub Pages
+- Check Settings → Pages to verify it's enabled
+- Hard refresh: Ctrl+Shift+R (Win) or Cmd+Shift+R (Mac)
 
 ## 📝 License
 

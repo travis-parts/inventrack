@@ -140,46 +140,115 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
 
 ---
 
-## Step 3: Deploy to Netlify
+## Step 3: Deploy to GitHub Pages
 
-### Option A: Drag and Drop (Easiest)
+### Create GitHub Repository
 
-1. Go to [app.netlify.com/drop](https://app.netlify.com/drop)
-2. Drag `index.html` from your computer
-3. Drop it in the box
-4. Wait 10 seconds
-5. You get a URL like: `https://random-name-123.netlify.app`
-6. Done!
+1. Go to [github.com](https://github.com)
+2. Sign up / Log in
+3. Click **"+" (top right)** → **"New repository"**
+4. Fill in:
+   - Repository name: `inventtrack-pro` (or your choice)
+   - Description: "Cloud inventory management system"
+   - Public (required for free GitHub Pages)
+   - Don't check "Initialize with README" (we have our own)
+5. Click **"Create repository"**
 
-### Option B: Connect to GitHub (Best for Updates)
+### Upload Files
 
-1. Push this folder to GitHub:
+**Option A: Upload via Website (Easiest)**
+
+1. On your new repo page, click **"uploading an existing file"**
+2. Drag ALL these files:
+   - `index.html`
+   - `schema.sql`
+   - `README.md`
+   - `SETUP.md`
+   - `GITHUB.md`
+   - `CHANGELOG.md`
+   - `LICENSE`
+   - `FILE_STRUCTURE.md`
+3. Commit message: "Initial commit - InvenTrack Pro v2.0"
+4. Click **"Commit changes"**
+
+**Option B: Use Git Command Line**
+
 ```bash
+# Navigate to your folder
+cd /path/to/your/inventtrack/files
+
+# Initialize git
 git init
+
+# Add all files
 git add .
-git commit -m "Initial commit"
-git remote add origin https://github.com/YOUR_USERNAME/inventtrack.git
+
+# Commit
+git commit -m "Initial commit - InvenTrack Pro v2.0"
+
+# Connect to GitHub (replace YOUR_USERNAME and REPO_NAME)
+git remote add origin https://github.com/YOUR_USERNAME/inventtrack-pro.git
+
+# Push to GitHub
+git branch -M main
 git push -u origin main
 ```
 
-2. Go to [app.netlify.com](https://app.netlify.com)
-3. Click "Add new site" → "Import an existing project"
-4. Choose GitHub
-5. Select your `inventtrack` repo
-6. Click "Deploy site"
-7. Done! Auto-deploys on every push
+### Enable GitHub Pages
 
-### Update Your Site (Netlify Drop)
+1. In your GitHub repository, click **"Settings"** (top right)
+2. Scroll down left sidebar, click **"Pages"**
+3. Under **"Source"**, select:
+   - Branch: `main`
+   - Folder: `/ (root)`
+4. Click **"Save"**
+5. Wait 1-2 minutes
+6. Refresh the page
+7. You'll see: **"Your site is live at `https://YOUR_USERNAME.github.io/inventtrack-pro/`"**
 
-1. Make changes to `index.html`
-2. Go to your Netlify site dashboard
-3. Go to "Deploys" tab
-4. Drag the new `index.html` into the deploy box
-5. Old version is replaced
+**Copy this URL - that's your app!** 🎉
+
+### Custom Domain (Optional)
+
+If you own a domain:
+
+1. In GitHub Pages settings, add your domain: `inventory.yourcompany.com`
+2. In your domain DNS settings, add:
+   - Type: `CNAME`
+   - Name: `inventory`
+   - Value: `YOUR_USERNAME.github.io`
+3. Wait for DNS to propagate (5-60 minutes)
+4. GitHub auto-generates SSL certificate (free)
 
 ---
 
-## Step 4: Install on Your Phone
+## Step 4: Update Your App (Future Changes)
+
+### When you make changes:
+
+**Option A: Via GitHub Website**
+1. Go to your repository
+2. Click on `index.html`
+3. Click the pencil icon (Edit)
+4. Make changes
+5. Scroll down, add commit message
+6. Click "Commit changes"
+7. Changes go live in 30-60 seconds!
+
+**Option B: Via Git**
+```bash
+# Edit index.html locally
+# Then:
+git add index.html
+git commit -m "Added new feature"
+git push
+```
+
+Changes automatically deploy to GitHub Pages! No separate deployment step needed.
+
+---
+
+## Step 5: Install on Your Phone
 
 ### iPhone (Safari)
 
