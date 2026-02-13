@@ -637,7 +637,7 @@
         async function loadInventory() {
             try {
                 showLoading(true);
-                const { data, error } = await db.from('inventory').select('*').order('sku');
+                const { data, error } = await db.from('inventory').select('*').order('sku').limit(50000);
                 if (error) throw error;
                 inventory = (data || []).map(item => ({
                     sku: item.sku,
