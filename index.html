@@ -276,57 +276,57 @@
                     </div>
                     
                     <div id="manualSearchScreen" style="display: none;">
-                        <div style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); height: 100vh; display: flex; flex-direction: column;">
+                        <div style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); max-height: calc(100vh - 80px); display: flex; flex-direction: column; overflow: hidden;">
                             <!-- Top section - display and matches (scrollable) -->
-                            <div style="flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 0;">
-                                <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">Type SKU:</h3>
+                            <div style="flex: 0 0 auto; padding: 12px; padding-bottom: 0;">
+                                <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">Type SKU:</h3>
                                 
                                 <!-- Display what's typed -->
-                                <div style="background: #f8fafc; border: 3px solid #3b82f6; border-radius: 10px; padding: 14px; margin-bottom: 12px; min-height: 50px; font-size: 24px; font-weight: 700; text-align: center; color: #1e293b; word-break: break-all;" id="skuDisplay">
+                                <div style="background: #f8fafc; border: 3px solid #3b82f6; border-radius: 10px; padding: 10px; margin-bottom: 8px; min-height: 40px; font-size: 20px; font-weight: 700; text-align: center; color: #1e293b; word-break: break-all;" id="skuDisplay">
                                     <span id="skuTyped"></span><span style="opacity: 0.3;">|</span>
                                 </div>
                                 
                                 <!-- Autocomplete dropdown -->
-                                <div id="quickMatchDropdown" style="max-height: 250px; overflow-y: auto; margin-bottom: 12px; display: none;"></div>
+                                <div id="quickMatchDropdown" style="max-height: 150px; overflow-y: auto; margin-bottom: 8px; display: none;"></div>
                             </div>
                             
                             <!-- Bottom section - keyboard (fixed) -->
-                            <div style="padding: 12px; background: white; border-top: 2px solid #e2e8f0;">
+                            <div style="flex: 0 0 auto; padding: 10px; background: white; border-top: 2px solid #e2e8f0;">
                                 <!-- Letter buttons (common prefixes) -->
-                                <div style="margin-bottom: 6px;">
-                                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 4px;">
-                                        <button onclick="addToSKU('P')" style="padding: 8px; border: none; border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af;">P</button>
-                                        <button onclick="addToSKU('M')" style="padding: 8px; border: none; border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af;">M</button>
-                                        <button onclick="addToSKU('W')" style="padding: 8px; border: none; border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af;">W</button>
-                                        <button onclick="addToSKU('G')" style="padding: 8px; border: none; border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af;">G</button>
-                                        <button onclick="addToSKU('H')" style="padding: 8px; border: none; border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af;">H</button>
+                                <div style="margin-bottom: 4px;">
+                                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; margin-bottom: 3px;">
+                                        <button onclick="addToSKU('P')" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af;">P</button>
+                                        <button onclick="addToSKU('M')" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af;">M</button>
+                                        <button onclick="addToSKU('W')" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af;">W</button>
+                                        <button onclick="addToSKU('G')" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af;">G</button>
+                                        <button onclick="addToSKU('H')" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af;">H</button>
                                     </div>
-                                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;">
-                                        <button onclick="addToSKU('A')" style="padding: 8px; border: none; border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b;">A</button>
-                                        <button onclick="addToSKU('B')" style="padding: 8px; border: none; border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b;">B</button>
-                                        <button onclick="addToSKU('C')" style="padding: 8px; border: none; border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b;">C</button>
-                                        <button onclick="addToSKU('D')" style="padding: 8px; border: none; border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b;">D</button>
-                                        <button onclick="addToSKU('-')" style="padding: 8px; border: none; border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b;">-</button>
+                                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px;">
+                                        <button onclick="addToSKU('A')" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b;">A</button>
+                                        <button onclick="addToSKU('B')" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b;">B</button>
+                                        <button onclick="addToSKU('C')" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b;">C</button>
+                                        <button onclick="addToSKU('D')" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b;">D</button>
+                                        <button onclick="addToSKU('-')" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b;">-</button>
                                     </div>
                                 </div>
                                 
                                 <!-- Number pad -->
-                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 6px;">
-                                    <button onclick="addToSKU('1')" style="padding: 12px; border: none; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">1</button>
-                                    <button onclick="addToSKU('2')" style="padding: 12px; border: none; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">2</button>
-                                    <button onclick="addToSKU('3')" style="padding: 12px; border: none; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">3</button>
-                                    <button onclick="addToSKU('4')" style="padding: 12px; border: none; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">4</button>
-                                    <button onclick="addToSKU('5')" style="padding: 12px; border: none; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">5</button>
-                                    <button onclick="addToSKU('6')" style="padding: 12px; border: none; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">6</button>
-                                    <button onclick="addToSKU('7')" style="padding: 12px; border: none; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">7</button>
-                                    <button onclick="addToSKU('8')" style="padding: 12px; border: none; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">8</button>
-                                    <button onclick="addToSKU('9')" style="padding: 12px; border: none; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">9</button>
-                                    <button onclick="backspaceSKU()" style="padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #ef4444; color: white;">⌫</button>
-                                    <button onclick="addToSKU('0')" style="padding: 12px; border: none; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">0</button>
-                                    <button onclick="clearSKU()" style="padding: 12px; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; background: #f59e0b; color: white;">CLR</button>
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 5px;">
+                                    <button onclick="addToSKU('1')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">1</button>
+                                    <button onclick="addToSKU('2')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">2</button>
+                                    <button onclick="addToSKU('3')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">3</button>
+                                    <button onclick="addToSKU('4')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">4</button>
+                                    <button onclick="addToSKU('5')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">5</button>
+                                    <button onclick="addToSKU('6')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">6</button>
+                                    <button onclick="addToSKU('7')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">7</button>
+                                    <button onclick="addToSKU('8')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">8</button>
+                                    <button onclick="addToSKU('9')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">9</button>
+                                    <button onclick="backspaceSKU()" style="padding: 10px; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; background: #ef4444; color: white;">⌫</button>
+                                    <button onclick="addToSKU('0')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">0</button>
+                                    <button onclick="clearSKU()" style="padding: 10px; border: none; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; background: #f59e0b; color: white;">CLR</button>
                                 </div>
                                 
-                                <button id="btnCancelManual" style="width: 100%; padding: 10px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; background: #64748b; color: white;">✕ Cancel</button>
+                                <button id="btnCancelManual" style="width: 100%; padding: 8px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; background: #64748b; color: white;">✕ Cancel</button>
                             </div>
                         </div>
                     </div>
