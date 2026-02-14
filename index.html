@@ -802,13 +802,35 @@
         async function loadInventory() {
             try {
                 showLoading(true);
-                const { data, error } = await db
-                    .from('inventory')
-                    .select('*', { count: 'exact' })
-                    .order('sku')
-                    .range(0, 99999);
-                if (error) throw error;
-                inventory = (data || []).map(item => ({
+                
+                // Load in batches to bypass Supabase 1000 row limit
+                let allData = [];
+                let page = 0;
+                const pageSize = 1000;
+                let hasMore = true;
+                
+                while (hasMore) {
+                    const start = page * pageSize;
+                    const end = start + pageSize - 1;
+                    
+                    const { data, error } = await db
+                        .from('inventory')
+                        .select('*')
+                        .order('sku')
+                        .range(start, end);
+                    
+                    if (error) throw error;
+                    
+                    if (data && data.length > 0) {
+                        allData = allData.concat(data);
+                        page++;
+                        hasMore = data.length === pageSize; // Stop if we got less than a full page
+                    } else {
+                        hasMore = false;
+                    }
+                }
+                
+                inventory = allData.map(item => ({
                     sku: item.sku,
                     description: item.description,
                     qtyOnHand: item.qty_on_hand,
