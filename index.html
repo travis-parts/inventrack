@@ -295,38 +295,38 @@
                                 <!-- Letter buttons (common prefixes) -->
                                 <div style="margin-bottom: 4px;">
                                     <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; margin-bottom: 3px;">
-                                        <button onclick="addToSKU('P')" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af;">P</button>
-                                        <button onclick="addToSKU('M')" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af;">M</button>
-                                        <button onclick="addToSKU('W')" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af;">W</button>
-                                        <button onclick="addToSKU('G')" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af;">G</button>
-                                        <button onclick="addToSKU('H')" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af;">H</button>
+                                        <button class="sku-key" data-key="P" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af; touch-action: manipulation;">P</button>
+                                        <button class="sku-key" data-key="M" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af; touch-action: manipulation;">M</button>
+                                        <button class="sku-key" data-key="W" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af; touch-action: manipulation;">W</button>
+                                        <button class="sku-key" data-key="G" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af; touch-action: manipulation;">G</button>
+                                        <button class="sku-key" data-key="H" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af; touch-action: manipulation;">H</button>
                                     </div>
                                     <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px;">
-                                        <button onclick="addToSKU('A')" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b;">A</button>
-                                        <button onclick="addToSKU('B')" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b;">B</button>
-                                        <button onclick="addToSKU('C')" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b;">C</button>
-                                        <button onclick="addToSKU('D')" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b;">D</button>
-                                        <button onclick="addToSKU('-')" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b;">-</button>
+                                        <button class="sku-key" data-key="A" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b; touch-action: manipulation;">A</button>
+                                        <button class="sku-key" data-key="B" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b; touch-action: manipulation;">B</button>
+                                        <button class="sku-key" data-key="C" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b; touch-action: manipulation;">C</button>
+                                        <button class="sku-key" data-key="D" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b; touch-action: manipulation;">D</button>
+                                        <button class="sku-key" data-key="-" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b; touch-action: manipulation;">-</button>
                                     </div>
                                 </div>
                                 
                                 <!-- Number pad -->
                                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 5px;">
-                                    <button onclick="addToSKU('1')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">1</button>
-                                    <button onclick="addToSKU('2')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">2</button>
-                                    <button onclick="addToSKU('3')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">3</button>
-                                    <button onclick="addToSKU('4')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">4</button>
-                                    <button onclick="addToSKU('5')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">5</button>
-                                    <button onclick="addToSKU('6')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">6</button>
-                                    <button onclick="addToSKU('7')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">7</button>
-                                    <button onclick="addToSKU('8')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">8</button>
-                                    <button onclick="addToSKU('9')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">9</button>
-                                    <button onclick="backspaceSKU()" style="padding: 10px; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; background: #ef4444; color: white;">⌫</button>
-                                    <button onclick="addToSKU('0')" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">0</button>
-                                    <button onclick="clearSKU()" style="padding: 10px; border: none; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; background: #f59e0b; color: white;">CLR</button>
+                                    <button class="sku-key" data-key="1" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white; touch-action: manipulation;">1</button>
+                                    <button class="sku-key" data-key="2" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white; touch-action: manipulation;">2</button>
+                                    <button class="sku-key" data-key="3" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white; touch-action: manipulation;">3</button>
+                                    <button class="sku-key" data-key="4" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white; touch-action: manipulation;">4</button>
+                                    <button class="sku-key" data-key="5" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white; touch-action: manipulation;">5</button>
+                                    <button class="sku-key" data-key="6" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white; touch-action: manipulation;">6</button>
+                                    <button class="sku-key" data-key="7" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white; touch-action: manipulation;">7</button>
+                                    <button class="sku-key" data-key="8" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white; touch-action: manipulation;">8</button>
+                                    <button class="sku-key" data-key="9" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white; touch-action: manipulation;">9</button>
+                                    <button id="btnBackspaceSKU" style="padding: 10px; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; background: #ef4444; color: white; touch-action: manipulation;">⌫</button>
+                                    <button class="sku-key" data-key="0" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white; touch-action: manipulation;">0</button>
+                                    <button id="btnClearSKU" style="padding: 10px; border: none; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; background: #f59e0b; color: white; touch-action: manipulation;">CLR</button>
                                 </div>
                                 
-                                <button id="btnCancelManual" style="width: 100%; padding: 8px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; background: #64748b; color: white;">✕ Cancel</button>
+                                <button id="btnCancelManual" style="width: 100%; padding: 8px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; background: #64748b; color: white; touch-action: manipulation;">✕ Cancel</button>
                             </div>
                         </div>
                     </div>
@@ -1389,6 +1389,50 @@
         
         // On-screen keyboard for manual SKU entry
         let currentSKUInput = '';
+        
+        // Add event listeners to keyboard buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle all SKU key buttons
+            document.querySelectorAll('.sku-key').forEach(button => {
+                button.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    const key = this.getAttribute('data-key');
+                    addToSKU(key);
+                }, { passive: false });
+                
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const key = this.getAttribute('data-key');
+                    addToSKU(key);
+                });
+            });
+            
+            // Backspace button
+            const btnBackspace = document.getElementById('btnBackspaceSKU');
+            if (btnBackspace) {
+                btnBackspace.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    backspaceSKU();
+                }, { passive: false });
+                btnBackspace.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    backspaceSKU();
+                });
+            }
+            
+            // Clear button
+            const btnClear = document.getElementById('btnClearSKU');
+            if (btnClear) {
+                btnClear.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    clearSKU();
+                }, { passive: false });
+                btnClear.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    clearSKU();
+                });
+            }
+        });
         
         function addToSKU(char) {
             currentSKUInput += char;
