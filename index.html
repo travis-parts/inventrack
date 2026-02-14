@@ -1390,7 +1390,29 @@
         // On-screen keyboard for manual SKU entry
         let currentSKUInput = '';
         
-        // Add event listeners to keyboard buttons
+        function addToSKU(char) {
+            currentSKUInput += char;
+            updateSKUDisplay();
+            checkForMatches();
+        }
+        
+        function backspaceSKU() {
+            currentSKUInput = currentSKUInput.slice(0, -1);
+            updateSKUDisplay();
+            checkForMatches();
+        }
+        
+        function clearSKU() {
+            currentSKUInput = '';
+            updateSKUDisplay();
+            document.getElementById('quickMatchDropdown').style.display = 'none';
+        }
+        
+        function updateSKUDisplay() {
+            document.getElementById('skuTyped').textContent = currentSKUInput || '';
+        }
+        
+        // Add event listeners to keyboard buttons AFTER functions are defined
         document.addEventListener('DOMContentLoaded', function() {
             // Handle all SKU key buttons
             document.querySelectorAll('.sku-key').forEach(button => {
@@ -1433,28 +1455,6 @@
                 });
             }
         });
-        
-        function addToSKU(char) {
-            currentSKUInput += char;
-            updateSKUDisplay();
-            checkForMatches();
-        }
-        
-        function backspaceSKU() {
-            currentSKUInput = currentSKUInput.slice(0, -1);
-            updateSKUDisplay();
-            checkForMatches();
-        }
-        
-        function clearSKU() {
-            currentSKUInput = '';
-            updateSKUDisplay();
-            document.getElementById('quickMatchDropdown').style.display = 'none';
-        }
-        
-        function updateSKUDisplay() {
-            document.getElementById('skuTyped').textContent = currentSKUInput || '';
-        }
         
         function checkForMatches() {
             const dropdown = document.getElementById('quickMatchDropdown');
