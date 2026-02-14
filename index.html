@@ -44,6 +44,9 @@
             <div class="menu-item" data-tab="shelf-audit" style="padding: 18px 20px; border-bottom: 1px solid #e0e0e0; cursor: pointer; font-size: 16px; font-weight: 500;">
                 <span>📋</span> Shelf Audit
             </div>
+            <div class="menu-item" data-tab="po-review" style="padding: 18px 20px; border-bottom: 1px solid #e0e0e0; cursor: pointer; font-size: 16px; font-weight: 500;">
+                <span>📦</span> PO Review
+            </div>
             <div class="menu-item" data-tab="count-reports" style="padding: 18px 20px; border-bottom: 1px solid #e0e0e0; cursor: pointer; font-size: 16px; font-weight: 500;">
                 <span>📊</span> Count Reports
             </div>
@@ -456,6 +459,156 @@
                 </div>
             </div>
 
+            <div id="po-review-tab" class="tab-content" style="display: none;">
+                <div id="poReviewSession" style="display: none;">
+                    <div style="background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <div>
+                                <div style="font-size: 18px; font-weight: 600;">PO Review</div>
+                                <div style="font-size: 13px; color: #64748b; margin-top: 4px;">
+                                    Reviewed: <span id="poReviewProgress" style="font-weight: 600; color: #3b82f6;">0</span> | 
+                                    To Order: <span id="poReviewOrderCount" style="font-weight: 600; color: #10b981;">0</span>
+                                </div>
+                            </div>
+                            <button id="btnFinishPOReview" style="padding: 10px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; background: #10b981; color: white;">✓ Finish</button>
+                        </div>
+                    </div>
+                    
+                    <div id="poReviewItemCard" style="display: none; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 16px;">
+                        <div style="text-align: center; margin-bottom: 16px;">
+                            <div style="font-size: 28px; font-weight: 700; color: #1e293b; margin-bottom: 4px;" id="poReviewSKU"></div>
+                            <div style="font-size: 16px; color: #64748b; margin-bottom: 8px;" id="poReviewDescription"></div>
+                            <div id="poReviewOrderBadge" style="padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; display: inline-block; margin-bottom: 12px;"></div>
+                        </div>
+                        
+                        <!-- Shelf Qty -->
+                        <div style="background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                            <div style="text-align: center; margin-bottom: 8px; font-size: 13px; color: #64748b; font-weight: 600;">SHELF QUANTITY</div>
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
+                                <button id="btnPOShelfMinus" style="width: 50px; height: 50px; border: none; border-radius: 8px; font-size: 24px; font-weight: 700; cursor: pointer; background: #ef4444; color: white;">−</button>
+                                <input type="number" id="poShelfQty" value="0" min="0" readonly style="width: 80px; height: 50px; padding: 0; border: 2px solid #3b82f6; border-radius: 8px; font-size: 24px; font-weight: 700; text-align: center; cursor: pointer;">
+                                <button id="btnPOShelfPlus" style="width: 50px; height: 50px; border: none; border-radius: 8px; font-size: 24px; font-weight: 700; cursor: pointer; background: #10b981; color: white;">+</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Min/Max -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                            <div>
+                                <label style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #64748b;">MIN STOCK</label>
+                                <input type="number" id="poMinStock" placeholder="0" min="0" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 18px; font-weight: 600; text-align: center;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #64748b;">MAX STOCK</label>
+                                <input type="number" id="poMaxStock" placeholder="0" min="0" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 18px; font-weight: 600; text-align: center;">
+                            </div>
+                        </div>
+                        
+                        <!-- Order Qty -->
+                        <div style="background: #dbeafe; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                            <div style="text-align: center; margin-bottom: 8px; font-size: 13px; color: #1e40af; font-weight: 600;">ADD TO ORDER</div>
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
+                                <button id="btnPOOrderMinus" style="width: 50px; height: 50px; border: none; border-radius: 8px; font-size: 24px; font-weight: 700; cursor: pointer; background: #ef4444; color: white;">−</button>
+                                <input type="number" id="poOrderQty" value="0" min="0" readonly style="width: 80px; height: 50px; padding: 0; border: 2px solid #1e40af; border-radius: 8px; font-size: 24px; font-weight: 700; text-align: center; cursor: pointer;">
+                                <button id="btnPOOrderPlus" style="width: 50px; height: 50px; border: none; border-radius: 8px; font-size: 24px; font-weight: 700; cursor: pointer; background: #10b981; color: white;">+</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Calculation Summary -->
+                        <div id="poCalculation" style="background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 13px; color: #64748b;"></div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <button id="btnSavePOReview" style="padding: 18px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #3b82f6; color: white;">✓ Save & Next</button>
+                            <button id="btnCancelPOReview" style="padding: 18px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #64748b; color: white;">Skip</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Keyboard for PO Review -->
+                    <div id="poReviewKeyboardScreen">
+                        <div style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); height: 100vh; display: flex; flex-direction: column;">
+                            <div style="flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 0;">
+                                <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">Enter SKU:</h3>
+                                
+                                <div style="background: #f8fafc; border: 3px solid #3b82f6; border-radius: 10px; padding: 14px; margin-bottom: 12px; min-height: 50px; font-size: 24px; font-weight: 700; text-align: center; color: #1e293b; word-break: break-all;" id="poReviewSkuDisplay">
+                                    <span id="poReviewSkuTyped"></span><span style="opacity: 0.3;">|</span>
+                                </div>
+                                
+                                <div id="poReviewQuickMatchDropdown" style="max-height: 250px; overflow-y: auto; margin-bottom: 12px; display: none;"></div>
+                            </div>
+                            
+                            <div style="padding: 12px; background: white; border-top: 2px solid #e2e8f0;">
+                                <div style="margin-bottom: 6px;">
+                                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 4px;">
+                                        <button onclick="addToPOReviewSKU('P')" style="padding: 8px; border: none; border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af;">P</button>
+                                        <button onclick="addToPOReviewSKU('M')" style="padding: 8px; border: none; border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af;">M</button>
+                                        <button onclick="addToPOReviewSKU('W')" style="padding: 8px; border: none; border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af;">W</button>
+                                        <button onclick="addToPOReviewSKU('G')" style="padding: 8px; border: none; border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af;">G</button>
+                                        <button onclick="addToPOReviewSKU('H')" style="padding: 8px; border: none; border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af;">H</button>
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;">
+                                        <button onclick="addToPOReviewSKU('F')" style="padding: 8px; border: none; border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b;">F</button>
+                                        <button onclick="addToPOReviewSKU('V')" style="padding: 8px; border: none; border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b;">V</button>
+                                        <button onclick="addToPOReviewSKU('D')" style="padding: 8px; border: none; border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b;">D</button>
+                                        <button onclick="addToPOReviewSKU('B')" style="padding: 8px; border: none; border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b;">B</button>
+                                        <button onclick="addToPOReviewSKU('-')" style="padding: 8px; border: none; border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b;">-</button>
+                                    </div>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 6px;">
+                                    <button onclick="addToPOReviewSKU('1')" style="padding: 12px; border: none; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">1</button>
+                                    <button onclick="addToPOReviewSKU('2')" style="padding: 12px; border: none; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">2</button>
+                                    <button onclick="addToPOReviewSKU('3')" style="padding: 12px; border: none; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">3</button>
+                                    <button onclick="addToPOReviewSKU('4')" style="padding: 12px; border: none; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">4</button>
+                                    <button onclick="addToPOReviewSKU('5')" style="padding: 12px; border: none; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">5</button>
+                                    <button onclick="addToPOReviewSKU('6')" style="padding: 12px; border: none; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">6</button>
+                                    <button onclick="addToPOReviewSKU('7')" style="padding: 12px; border: none; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">7</button>
+                                    <button onclick="addToPOReviewSKU('8')" style="padding: 12px; border: none; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">8</button>
+                                    <button onclick="addToPOReviewSKU('9')" style="padding: 12px; border: none; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">9</button>
+                                    <button onclick="backspacePOReviewSKU()" style="padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #ef4444; color: white;">⌫</button>
+                                    <button onclick="addToPOReviewSKU('0')" style="padding: 12px; border: none; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">0</button>
+                                    <button onclick="clearPOReviewSKU()" style="padding: 12px; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; background: #f59e0b; color: white;">CLR</button>
+                                </div>
+                                
+                                <button id="btnCancelPOReviewKeyboard" style="width: 100%; padding: 10px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; background: #64748b; color: white;">✕ Cancel Session</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="startPOReviewScreen">
+                    <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 16px;">
+                        <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 16px;">📦 PO Review</h2>
+                        <p style="color: #64748b; margin-bottom: 20px; line-height: 1.6;">
+                            Walk your shelf, check stock levels, set min/max, and add items to your purchase order. Avoid double-ordering by entering your current PO.
+                        </p>
+                        
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 600;">Session Name</label>
+                            <input type="text" id="poReviewSessionName" placeholder="e.g., MW Parts - Supplier ABC" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px;">
+                        </div>
+                        
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 600;">Brand Filter (Optional)</label>
+                            <input type="text" id="poReviewBrandFilter" placeholder="e.g., MW, FD, GH, V (leave empty for all)" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; text-transform: uppercase;">
+                            <small style="color: #64748b; font-size: 13px; display: block; margin-top: 6px;">
+                                Filter by brand prefix (letters before first number/dash)
+                            </small>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 600;">Current PO (Optional - CSV or Paste)</label>
+                            <div style="background: #dbeafe; padding: 14px; border-radius: 8px; margin-bottom: 12px; font-size: 14px; color: #1e40af;">
+                                <strong>Format:</strong> SKU, Qty on Order<br>
+                                Example:<br>
+                                <code>MW2018-7615-BSK, 50<br>MW2019-1234-XYZ, 100</code>
+                            </div>
+                            <textarea id="poReviewCurrentPO" rows="6" placeholder="Paste current PO here (optional)" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; font-family: monospace;"></textarea>
+                        </div>
+                        
+                        <button id="btnStartPOReview" style="padding: 16px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #10b981; color: white; width: 100%;">🚀 Start PO Review</button>
+                    </div>
+                </div>
+            </div>
+
             <div id="count-reports-tab" class="tab-content" style="display: none;">
                 <div style="background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 16px;">
                     <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 12px;">Count Reports</h2>
@@ -514,6 +667,10 @@
         let auditedItems = [];
         let auditReturnList = [];
         let currentAuditSKUInput = '';
+        let poReviewSession = null;
+        let poReviewedItems = [];
+        let currentPOList = {};
+        let currentPOReviewSKUInput = '';
 
         // SKU Autocomplete
         document.getElementById('sku').addEventListener('input', function(e) {
@@ -1834,6 +1991,390 @@
             const a = document.createElement('a');
             a.href = url;
             a.download = 'Audit_' + session.name.replace(/\s+/g, '_') + '_' + new Date(session.startTime).toISOString().slice(0,10) + '.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // PO Review Functions
+        document.getElementById('btnStartPOReview').addEventListener('click', startPOReviewSession);
+        document.getElementById('btnSavePOReview').addEventListener('click', savePOReviewItem);
+        document.getElementById('btnCancelPOReview').addEventListener('click', () => showPOReviewKeyboard());
+        document.getElementById('btnCancelPOReviewKeyboard').addEventListener('click', () => {
+            if (confirm('Cancel this PO review session?')) {
+                finishPOReviewSession();
+            }
+        });
+        document.getElementById('btnFinishPOReview').addEventListener('click', finishPOReviewSession);
+        
+        // Shelf qty buttons
+        document.getElementById('btnPOShelfMinus').addEventListener('click', () => {
+            const input = document.getElementById('poShelfQty');
+            const val = parseInt(input.value) || 0;
+            if (val > 0) input.value = val - 1;
+            updatePOCalculation();
+        });
+        
+        document.getElementById('btnPOShelfPlus').addEventListener('click', () => {
+            const input = document.getElementById('poShelfQty');
+            input.value = (parseInt(input.value) || 0) + 1;
+            updatePOCalculation();
+        });
+        
+        document.getElementById('poShelfQty').addEventListener('click', function() {
+            this.removeAttribute('readonly');
+            this.select();
+        });
+        
+        document.getElementById('poShelfQty').addEventListener('blur', function() {
+            this.setAttribute('readonly', 'readonly');
+            updatePOCalculation();
+        });
+        
+        // Order qty buttons
+        document.getElementById('btnPOOrderMinus').addEventListener('click', () => {
+            const input = document.getElementById('poOrderQty');
+            const val = parseInt(input.value) || 0;
+            if (val > 0) input.value = val - 1;
+            updatePOCalculation();
+        });
+        
+        document.getElementById('btnPOOrderPlus').addEventListener('click', () => {
+            const input = document.getElementById('poOrderQty');
+            input.value = (parseInt(input.value) || 0) + 1;
+            updatePOCalculation();
+        });
+        
+        document.getElementById('poOrderQty').addEventListener('click', function() {
+            this.removeAttribute('readonly');
+            this.select();
+        });
+        
+        document.getElementById('poOrderQty').addEventListener('blur', function() {
+            this.setAttribute('readonly', 'readonly');
+            updatePOCalculation();
+        });
+        
+        // Min/Max change listeners
+        document.getElementById('poMinStock').addEventListener('input', updatePOCalculation);
+        document.getElementById('poMaxStock').addEventListener('input', updatePOCalculation);
+        
+        // PO Review keyboard functions
+        function addToPOReviewSKU(char) {
+            currentPOReviewSKUInput += char;
+            updatePOReviewSKUDisplay();
+            checkForPOReviewMatches();
+        }
+        
+        function backspacePOReviewSKU() {
+            currentPOReviewSKUInput = currentPOReviewSKUInput.slice(0, -1);
+            updatePOReviewSKUDisplay();
+            checkForPOReviewMatches();
+        }
+        
+        function clearPOReviewSKU() {
+            currentPOReviewSKUInput = '';
+            updatePOReviewSKUDisplay();
+            document.getElementById('poReviewQuickMatchDropdown').style.display = 'none';
+        }
+        
+        function updatePOReviewSKUDisplay() {
+            document.getElementById('poReviewSkuTyped').textContent = currentPOReviewSKUInput || '';
+        }
+        
+        function extractBrandPrefix(sku) {
+            // Extract letters before first number or dash
+            const match = sku.match(/^([A-Z]+)/i);
+            return match ? match[1].toUpperCase() : '';
+        }
+        
+        function checkForPOReviewMatches() {
+            const dropdown = document.getElementById('poReviewQuickMatchDropdown');
+            
+            if (currentPOReviewSKUInput.length < 2) {
+                dropdown.style.display = 'none';
+                return;
+            }
+            
+            let matches = inventory.filter(item => 
+                item.sku.toUpperCase().includes(currentPOReviewSKUInput.toUpperCase())
+            );
+            
+            // Apply brand filter if set
+            if (poReviewSession && poReviewSession.brandFilter) {
+                matches = matches.filter(item => {
+                    const prefix = extractBrandPrefix(item.sku);
+                    return prefix === poReviewSession.brandFilter;
+                });
+            }
+            
+            matches = matches.slice(0, 5);
+            
+            if (matches.length === 0) {
+                dropdown.style.display = 'none';
+                return;
+            }
+            
+            let html = '<div style="background: #f8fafc; padding: 8px; border-radius: 8px; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: #64748b;">Quick Matches:</div>';
+            matches.forEach(item => {
+                const alreadyReviewed = poReviewedItems.find(r => r.sku === item.sku);
+                const reviewedBadge = alreadyReviewed ? ' <span style="color: #10b981;">✓</span>' : '';
+                
+                const onOrder = currentPOList[item.sku] || 0;
+                const onOrderBadge = onOrder > 0 ? ' <span style="color: #3b82f6;">📦 ' + onOrder + '</span>' : '';
+                
+                html += '<div style="padding: 12px; background: white; border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 8px; cursor: pointer;" onclick="selectPOReviewSKU(\'' + item.sku + '\')">';
+                html += '<div style="font-weight: 700; color: #1e293b; margin-bottom: 4px;">' + item.sku + reviewedBadge + onOrderBadge + '</div>';
+                if (item.description) html += '<div style="font-size: 13px; color: #64748b;">' + item.description + '</div>';
+                html += '</div>';
+            });
+            
+            dropdown.innerHTML = html;
+            dropdown.style.display = 'block';
+        }
+        
+        function selectPOReviewSKU(sku) {
+            currentPOReviewSKUInput = '';
+            updatePOReviewSKUDisplay();
+            document.getElementById('poReviewQuickMatchDropdown').style.display = 'none';
+            loadPOReviewItem(sku);
+        }
+        
+        function startPOReviewSession() {
+            const sessionName = document.getElementById('poReviewSessionName').value.trim() || 'PO Review';
+            const brandFilter = document.getElementById('poReviewBrandFilter').value.trim().toUpperCase();
+            const currentPOText = document.getElementById('poReviewCurrentPO').value.trim();
+            
+            // Parse current PO
+            currentPOList = {};
+            if (currentPOText) {
+                const lines = currentPOText.split('\n');
+                lines.forEach(line => {
+                    const parts = line.split(',').map(p => p.trim());
+                    if (parts.length >= 2) {
+                        const sku = parts[0].toUpperCase();
+                        const qty = parseInt(parts[1]) || 0;
+                        if (sku && sku !== 'SKU') {
+                            currentPOList[sku] = qty;
+                        }
+                    }
+                });
+            }
+            
+            poReviewSession = {
+                id: Date.now(),
+                name: sessionName,
+                startTime: new Date().toISOString(),
+                brandFilter: brandFilter || null,
+                currentPO: currentPOList,
+                items: []
+            };
+            
+            poReviewedItems = [];
+            
+            document.getElementById('startPOReviewScreen').style.display = 'none';
+            document.getElementById('poReviewSession').style.display = 'block';
+            updatePOReviewProgress();
+            showPOReviewKeyboard();
+            
+            const poCount = Object.keys(currentPOList).length;
+            if (poCount > 0) {
+                showNotification(poCount + ' items in current PO');
+            }
+        }
+        
+        function showPOReviewKeyboard() {
+            document.getElementById('poReviewKeyboardScreen').style.display = 'block';
+            document.getElementById('poReviewItemCard').style.display = 'none';
+        }
+        
+        function loadPOReviewItem(sku) {
+            const item = inventory.find(i => i.sku === sku);
+            if (!item) {
+                showNotification('SKU not found in inventory', 'error');
+                return;
+            }
+            
+            // Check if already reviewed
+            const previousReview = poReviewedItems.find(r => r.sku === sku);
+            
+            document.getElementById('poReviewKeyboardScreen').style.display = 'none';
+            document.getElementById('poReviewItemCard').style.display = 'block';
+            
+            document.getElementById('poReviewSKU').textContent = sku;
+            document.getElementById('poReviewDescription').textContent = item.description || '-';
+            
+            // Show if on current PO
+            const onOrder = currentPOList[sku] || 0;
+            const badge = document.getElementById('poReviewOrderBadge');
+            if (onOrder > 0) {
+                badge.textContent = '📦 ON ORDER: ' + onOrder + ' units';
+                badge.style.background = '#dbeafe';
+                badge.style.color = '#1e40af';
+                badge.style.display = 'inline-block';
+            } else {
+                badge.textContent = '⚠️ NOT ON ORDER';
+                badge.style.background = '#fef3c7';
+                badge.style.color = '#92400e';
+                badge.style.display = 'inline-block';
+            }
+            
+            // Set values from previous review or defaults
+            if (previousReview) {
+                document.getElementById('poShelfQty').value = previousReview.shelfQty;
+                document.getElementById('poMinStock').value = previousReview.minStock;
+                document.getElementById('poMaxStock').value = previousReview.maxStock;
+                document.getElementById('poOrderQty').value = previousReview.orderQty;
+            } else {
+                document.getElementById('poShelfQty').value = item.qtyOnHand || 0;
+                document.getElementById('poMinStock').value = item.stockMin || '';
+                document.getElementById('poMaxStock').value = item.stockMax || '';
+                document.getElementById('poOrderQty').value = 0;
+            }
+            
+            updatePOCalculation();
+        }
+        
+        function updatePOCalculation() {
+            const sku = document.getElementById('poReviewSKU').textContent;
+            const shelfQty = parseInt(document.getElementById('poShelfQty').value) || 0;
+            const minStock = parseInt(document.getElementById('poMinStock').value) || 0;
+            const maxStock = parseInt(document.getElementById('poMaxStock').value) || 0;
+            const onOrder = currentPOList[sku] || 0;
+            const orderQty = parseInt(document.getElementById('poOrderQty').value) || 0;
+            
+            const totalOnOrder = onOrder + orderQty;
+            const stockAfterDelivery = shelfQty + totalOnOrder;
+            
+            let html = '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">';
+            html += '<div><strong>On Shelf:</strong> ' + shelfQty + '</div>';
+            html += '<div><strong>Total on Order:</strong> ' + totalOnOrder + '</div>';
+            html += '<div><strong>After Delivery:</strong> ' + stockAfterDelivery + '</div>';
+            
+            if (minStock > 0 && maxStock > 0) {
+                if (stockAfterDelivery < minStock) {
+                    html += '<div style="color: #ef4444;"><strong>Status:</strong> Below Min</div>';
+                } else if (stockAfterDelivery > maxStock) {
+                    html += '<div style="color: #f59e0b;"><strong>Status:</strong> Above Max</div>';
+                } else {
+                    html += '<div style="color: #10b981;"><strong>Status:</strong> Good</div>';
+                }
+            }
+            
+            html += '</div>';
+            
+            document.getElementById('poCalculation').innerHTML = html;
+        }
+        
+        async function savePOReviewItem() {
+            const sku = document.getElementById('poReviewSKU').textContent;
+            const shelfQty = parseInt(document.getElementById('poShelfQty').value) || 0;
+            const minStock = parseInt(document.getElementById('poMinStock').value) || 0;
+            const maxStock = parseInt(document.getElementById('poMaxStock').value) || 0;
+            const orderQty = parseInt(document.getElementById('poOrderQty').value) || 0;
+            const onOrder = currentPOList[sku] || 0;
+            
+            const item = inventory.find(i => i.sku === sku);
+            
+            // Remove if already reviewed
+            poReviewedItems = poReviewedItems.filter(r => r.sku !== sku);
+            
+            const reviewRecord = {
+                sku: sku,
+                description: item.description,
+                shelfQty: shelfQty,
+                minStock: minStock,
+                maxStock: maxStock,
+                alreadyOnOrder: onOrder,
+                orderQty: orderQty,
+                totalOrder: onOrder + orderQty,
+                reviewedAt: new Date().toISOString()
+            };
+            
+            poReviewedItems.push(reviewRecord);
+            poReviewSession.items = poReviewedItems;
+            
+            // Update inventory min/max in database
+            try {
+                await db.from('inventory').update({
+                    stock_min: minStock,
+                    stock_max: maxStock,
+                    updated_at: new Date().toISOString()
+                }).eq('sku', sku);
+                
+                // Update local inventory
+                if (item) {
+                    item.stockMin = minStock;
+                    item.stockMax = maxStock;
+                }
+            } catch (e) {
+                console.error('Error updating min/max:', e);
+            }
+            
+            updatePOReviewProgress();
+            showPOReviewKeyboard();
+            showNotification('✓ ' + sku + ' reviewed');
+        }
+        
+        function updatePOReviewProgress() {
+            const orderCount = poReviewedItems.filter(i => i.orderQty > 0).length;
+            
+            document.getElementById('poReviewProgress').textContent = poReviewedItems.length;
+            document.getElementById('poReviewOrderCount').textContent = orderCount;
+        }
+        
+        function finishPOReviewSession() {
+            if (!poReviewSession || poReviewedItems.length === 0) {
+                showNotification('No items reviewed', 'error');
+                return;
+            }
+            
+            poReviewSession.endTime = new Date().toISOString();
+            poReviewSession.completed = true;
+            
+            const orderCount = poReviewedItems.filter(i => i.orderQty > 0).length;
+            
+            poReviewSession.summary = {
+                total: poReviewedItems.length,
+                toOrder: orderCount
+            };
+            
+            // Export immediately
+            exportPOReviewSession();
+            
+            document.getElementById('poReviewSession').style.display = 'none';
+            document.getElementById('startPOReviewScreen').style.display = 'block';
+            document.getElementById('poReviewSessionName').value = '';
+            document.getElementById('poReviewBrandFilter').value = '';
+            document.getElementById('poReviewCurrentPO').value = '';
+            
+            showNotification('PO Review complete! ' + orderCount + ' items to order');
+            
+            poReviewSession = null;
+            poReviewedItems = [];
+            currentPOList = {};
+        }
+        
+        function exportPOReviewSession() {
+            const session = poReviewSession;
+            let csv = 'PO Review Report\n';
+            csv += 'Session: ' + session.name + '\n';
+            csv += 'Date: ' + new Date(session.startTime).toLocaleString() + '\n';
+            if (session.brandFilter) csv += 'Brand Filter: ' + session.brandFilter + '\n';
+            csv += '\n';
+            csv += 'SKU,Description,Shelf Qty,Min,Max,Already on Order,Add to Order,Total Order,Reviewed At\n';
+            
+            session.items.forEach(item => {
+                csv += '"' + item.sku + '","' + (item.description || '') + '",';
+                csv += item.shelfQty + ',' + item.minStock + ',' + item.maxStock + ',';
+                csv += item.alreadyOnOrder + ',' + item.orderQty + ',' + item.totalOrder + ',';
+                csv += '"' + new Date(item.reviewedAt).toLocaleString() + '"\n';
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'PO_Review_' + session.name.replace(/\s+/g, '_') + '_' + new Date(session.startTime).toISOString().slice(0,10) + '.csv';
             a.click();
             URL.revokeObjectURL(url);
         }
