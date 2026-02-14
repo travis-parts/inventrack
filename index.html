@@ -15,6 +15,7 @@
                 <h1 style="font-size: 20px; margin: 0;">InvenTrack Pro</h1>
             </div>
             <div style="display: flex; align-items: center; gap: 12px;">
+                <button id="btnRefresh" style="background: rgba(255,255,255,0.2); border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; color: white; font-size: 18px; font-weight: 700;" title="Refresh from database">🔄</button>
                 <div id="syncIndicator" style="padding: 6px 12px; background: rgba(255,255,255,0.2); border-radius: 6px; font-size: 12px; color: #86efac;">
                     <span>●</span> <span id="syncText">Synced</span>
                 </div>
@@ -737,6 +738,13 @@
         document.getElementById('menuOverlay').addEventListener('click', function() {
             this.style.display = 'none';
             document.getElementById('menuPanel').style.transform = 'translateX(-100%)';
+        });
+        
+        document.getElementById('btnRefresh').addEventListener('click', async function() {
+            this.textContent = '⟳';
+            await loadInventory();
+            this.textContent = '🔄';
+            showNotification('✓ Refreshed from database');
         });
 
         document.querySelectorAll('.menu-item').forEach(item => {
