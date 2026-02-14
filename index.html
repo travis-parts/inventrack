@@ -802,7 +802,11 @@
         async function loadInventory() {
             try {
                 showLoading(true);
-                const { data, error } = await db.from('inventory').select('*').order('sku').limit(50000);
+                const { data, error } = await db
+                    .from('inventory')
+                    .select('*', { count: 'exact' })
+                    .order('sku')
+                    .range(0, 99999);
                 if (error) throw error;
                 inventory = (data || []).map(item => ({
                     sku: item.sku,
@@ -812,6 +816,7 @@
                     stockMax: item.stock_max,
                     location: item.location
                 }));
+                console.log('Loaded inventory items:', inventory.length);
                 updateDashboard();
                 displayInventory();
             } catch (e) {
