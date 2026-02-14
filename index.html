@@ -276,58 +276,21 @@
                     </div>
                     
                     <div id="manualSearchScreen" style="display: none;">
-                        <div style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); max-height: calc(100vh - 80px); display: flex; flex-direction: column; overflow: hidden;">
-                            <!-- Top section - display and matches (scrollable) -->
-                            <div style="flex: 0 0 auto; padding: 12px; padding-bottom: 0;">
-                                <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">Type SKU:</h3>
-                                
-                                <!-- Display what's typed -->
-                                <div style="background: #f8fafc; border: 3px solid #3b82f6; border-radius: 10px; padding: 10px; margin-bottom: 8px; min-height: 40px; font-size: 20px; font-weight: 700; text-align: center; color: #1e293b; word-break: break-all;" id="skuDisplay">
-                                    <span id="skuTyped"></span><span style="opacity: 0.3;">|</span>
-                                </div>
-                                
-                                <!-- Autocomplete dropdown -->
-                                <div id="quickMatchDropdown" style="max-height: 150px; overflow-y: auto; margin-bottom: 8px; display: none;"></div>
-                            </div>
+                        <div style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 20px;">
+                            <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 16px;">Enter SKU:</h3>
                             
-                            <!-- Bottom section - keyboard (fixed) -->
-                            <div style="flex: 0 0 auto; padding: 10px; background: white; border-top: 2px solid #e2e8f0;">
-                                <!-- Letter buttons (common prefixes) -->
-                                <div style="margin-bottom: 4px;">
-                                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; margin-bottom: 3px;">
-                                        <button class="sku-key" data-key="P" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af; touch-action: manipulation;">P</button>
-                                        <button class="sku-key" data-key="M" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af; touch-action: manipulation;">M</button>
-                                        <button class="sku-key" data-key="W" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af; touch-action: manipulation;">W</button>
-                                        <button class="sku-key" data-key="G" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af; touch-action: manipulation;">G</button>
-                                        <button class="sku-key" data-key="H" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af; touch-action: manipulation;">H</button>
-                                    </div>
-                                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px;">
-                                        <button class="sku-key" data-key="A" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b; touch-action: manipulation;">A</button>
-                                        <button class="sku-key" data-key="B" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b; touch-action: manipulation;">B</button>
-                                        <button class="sku-key" data-key="C" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b; touch-action: manipulation;">C</button>
-                                        <button class="sku-key" data-key="D" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b; touch-action: manipulation;">D</button>
-                                        <button class="sku-key" data-key="-" style="padding: 6px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; background: #f1f5f9; color: #64748b; touch-action: manipulation;">-</button>
-                                    </div>
-                                </div>
-                                
-                                <!-- Number pad -->
-                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 5px;">
-                                    <button class="sku-key" data-key="1" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white; touch-action: manipulation;">1</button>
-                                    <button class="sku-key" data-key="2" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white; touch-action: manipulation;">2</button>
-                                    <button class="sku-key" data-key="3" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white; touch-action: manipulation;">3</button>
-                                    <button class="sku-key" data-key="4" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white; touch-action: manipulation;">4</button>
-                                    <button class="sku-key" data-key="5" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white; touch-action: manipulation;">5</button>
-                                    <button class="sku-key" data-key="6" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white; touch-action: manipulation;">6</button>
-                                    <button class="sku-key" data-key="7" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white; touch-action: manipulation;">7</button>
-                                    <button class="sku-key" data-key="8" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white; touch-action: manipulation;">8</button>
-                                    <button class="sku-key" data-key="9" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white; touch-action: manipulation;">9</button>
-                                    <button id="btnBackspaceSKU" style="padding: 10px; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; background: #ef4444; color: white; touch-action: manipulation;">⌫</button>
-                                    <button class="sku-key" data-key="0" style="padding: 10px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white; touch-action: manipulation;">0</button>
-                                    <button id="btnClearSKU" style="padding: 10px; border: none; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; background: #f59e0b; color: white; touch-action: manipulation;">CLR</button>
-                                </div>
-                                
-                                <button id="btnCancelManual" style="width: 100%; padding: 8px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; background: #64748b; color: white; touch-action: manipulation;">✕ Cancel</button>
-                            </div>
+                            <!-- Real input field for device keyboard -->
+                            <input type="text" 
+                                   id="manualSKUInput" 
+                                   placeholder="Type or scan SKU..." 
+                                   inputmode="text"
+                                   autocapitalize="characters"
+                                   style="width: 100%; padding: 16px; border: 3px solid #3b82f6; border-radius: 10px; font-size: 20px; font-weight: 700; text-align: center; margin-bottom: 16px;">
+                            
+                            <!-- Autocomplete dropdown -->
+                            <div id="quickMatchDropdown" style="max-height: 400px; overflow-y: auto; margin-bottom: 16px; display: none;"></div>
+                            
+                            <button id="btnCancelManual" style="width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #64748b; color: white;">✕ Cancel</button>
                         </div>
                     </div>
                 </div>
@@ -1387,71 +1350,9 @@
             this.setAttribute('readonly', 'readonly');
         });
         
-        // On-screen keyboard for manual SKU entry
-        let currentSKUInput = '';
+        // Manual Count with device keyboard
         
-        function addToSKU(char) {
-            currentSKUInput += char;
-            updateSKUDisplay();
-            checkForMatches();
-        }
-        
-        function backspaceSKU() {
-            currentSKUInput = currentSKUInput.slice(0, -1);
-            updateSKUDisplay();
-            checkForMatches();
-        }
-        
-        function clearSKU() {
-            currentSKUInput = '';
-            updateSKUDisplay();
-            document.getElementById('quickMatchDropdown').style.display = 'none';
-        }
-        
-        function updateSKUDisplay() {
-            document.getElementById('skuTyped').textContent = currentSKUInput || '';
-        }
-        
-        function checkForMatches() {
-            const dropdown = document.getElementById('quickMatchDropdown');
-            
-            if (currentSKUInput.length < 2) {
-                dropdown.style.display = 'none';
-                return;
-            }
-            
-            const matches = inventory.filter(item => 
-                item.sku.toUpperCase().includes(currentSKUInput.toUpperCase())
-            ).slice(0, 5);
-            
-            if (matches.length === 0) {
-                dropdown.style.display = 'none';
-                return;
-            }
-            
-            let html = '<div style="background: #f8fafc; padding: 8px; border-radius: 8px; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: #64748b;">Quick Matches:</div>';
-            matches.forEach(item => {
-                html += '<div style="padding: 12px; background: white; border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 8px; cursor: pointer;" onclick="selectQuickMatch(\'' + item.sku + '\')">';
-                html += '<div style="font-weight: 700; color: #1e293b; margin-bottom: 4px;">' + item.sku + '</div>';
-                if (item.description) html += '<div style="font-size: 13px; color: #64748b;">' + item.description + '</div>';
-                html += '</div>';
-            });
-            
-            dropdown.innerHTML = html;
-            dropdown.style.display = 'block';
-        }
-        
-        function selectQuickMatch(sku) {
-            const item = inventory.find(i => i.sku === sku);
-            if (item) {
-                currentSKUInput = '';
-                document.getElementById('quickMatchDropdown').style.display = 'none';
-                hideManualSearch();
-                loadScanItem(item);
-            }
-        }
-        
-        // Manual SKU input with autocomplete (old method - keeping as backup)
+        // Old event listener cleanup
         document.getElementById('manualSKUInput') && document.getElementById('manualSKUInput').addEventListener('input', function(e) {
             const value = e.target.value.toUpperCase();
             const dropdown = document.getElementById('manualSKUDropdown');
@@ -1519,65 +1420,67 @@
             document.getElementById('manualSearchScreen').style.display = 'block';
             document.getElementById('scanCameraScreen').style.display = 'none';
             
-            // Attach keyboard event listeners when screen is shown
-            attachKeyboardListeners();
-        }
-        
-        function attachKeyboardListeners() {
-            // Only attach once
-            if (window.keyboardListenersAttached) return;
-            window.keyboardListenersAttached = true;
+            const input = document.getElementById('manualSKUInput');
+            input.value = '';
+            setTimeout(() => input.focus(), 100);
             
-            // Handle all SKU key buttons
-            document.querySelectorAll('.sku-key').forEach(button => {
-                button.addEventListener('touchstart', function(e) {
-                    e.preventDefault();
-                    const key = this.getAttribute('data-key');
-                    addToSKU(key);
-                }, { passive: false });
-                
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const key = this.getAttribute('data-key');
-                    addToSKU(key);
-                });
-            });
+            input.oninput = function() {
+                checkForMatches();
+            };
             
-            // Backspace button
-            const btnBackspace = document.getElementById('btnBackspaceSKU');
-            if (btnBackspace) {
-                btnBackspace.addEventListener('touchstart', function(e) {
-                    e.preventDefault();
-                    backspaceSKU();
-                }, { passive: false });
-                btnBackspace.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    backspaceSKU();
-                });
-            }
-            
-            // Clear button
-            const btnClear = document.getElementById('btnClearSKU');
-            if (btnClear) {
-                btnClear.addEventListener('touchstart', function(e) {
-                    e.preventDefault();
-                    clearSKU();
-                }, { passive: false });
-                btnClear.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    clearSKU();
-                });
-            }
-            
-            console.log('Keyboard listeners attached');
+            input.onkeypress = function(e) {
+                if (e.key === 'Enter') {
+                    const sku = this.value.trim().toUpperCase();
+                    if (sku) {
+                        loadScanItem(sku);
+                    }
+                }
+            };
         }
         
         function hideManualSearch() {
-            currentSKUInput = '';
-            updateSKUDisplay();
             document.getElementById('quickMatchDropdown').style.display = 'none';
             document.getElementById('manualSearchScreen').style.display = 'none';
-            // No camera screen - just hide manual search
+        }
+        
+        function checkForMatches() {
+            const input = document.getElementById('manualSKUInput').value.trim().toUpperCase();
+            const dropdown = document.getElementById('quickMatchDropdown');
+            
+            if (input.length < 2) {
+                dropdown.style.display = 'none';
+                return;
+            }
+            
+            const matches = inventory.filter(item => 
+                item.sku.toUpperCase().includes(input)
+            ).slice(0, 5);
+            
+            if (matches.length === 0) {
+                dropdown.style.display = 'none';
+                return;
+            }
+            
+            let html = '';
+            matches.forEach(item => {
+                const alreadyCounted = scanCountedItems.includes(item.sku);
+                const badge = alreadyCounted ? ' <span style="color: #10b981;">✓</span>' : '';
+                
+                html += '<div style="padding: 14px; background: white; border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 8px; cursor: pointer;" onclick="selectQuickMatch(\'' + item.sku + '\')">';
+                html += '<div style="font-weight: 700; color: #1e293b; margin-bottom: 4px;">' + item.sku + badge + '</div>';
+                if (item.description) html += '<div style="font-size: 13px; color: #64748b;">' + item.description + '</div>';
+                if (item.location) html += '<div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">📍 ' + item.location + '</div>';
+                html += '</div>';
+            });
+            
+            dropdown.innerHTML = html;
+            dropdown.style.display = 'block';
+        }
+        
+        function selectQuickMatch(sku) {
+            document.getElementById('manualSKUInput').value = '';
+            document.getElementById('quickMatchDropdown').style.display = 'none';
+            loadScanItem(sku);
         }
         
         async function handlePhotoCapture(event) {
