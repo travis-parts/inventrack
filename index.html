@@ -1412,50 +1412,6 @@
             document.getElementById('skuTyped').textContent = currentSKUInput || '';
         }
         
-        // Add event listeners to keyboard buttons AFTER functions are defined
-        document.addEventListener('DOMContentLoaded', function() {
-            // Handle all SKU key buttons
-            document.querySelectorAll('.sku-key').forEach(button => {
-                button.addEventListener('touchstart', function(e) {
-                    e.preventDefault();
-                    const key = this.getAttribute('data-key');
-                    addToSKU(key);
-                }, { passive: false });
-                
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const key = this.getAttribute('data-key');
-                    addToSKU(key);
-                });
-            });
-            
-            // Backspace button
-            const btnBackspace = document.getElementById('btnBackspaceSKU');
-            if (btnBackspace) {
-                btnBackspace.addEventListener('touchstart', function(e) {
-                    e.preventDefault();
-                    backspaceSKU();
-                }, { passive: false });
-                btnBackspace.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    backspaceSKU();
-                });
-            }
-            
-            // Clear button
-            const btnClear = document.getElementById('btnClearSKU');
-            if (btnClear) {
-                btnClear.addEventListener('touchstart', function(e) {
-                    e.preventDefault();
-                    clearSKU();
-                }, { passive: false });
-                btnClear.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    clearSKU();
-                });
-            }
-        });
-        
         function checkForMatches() {
             const dropdown = document.getElementById('quickMatchDropdown');
             
@@ -1562,7 +1518,58 @@
         function showManualSearch() {
             document.getElementById('manualSearchScreen').style.display = 'block';
             document.getElementById('scanCameraScreen').style.display = 'none';
-            document.getElementById('manualSKUInput').focus();
+            
+            // Attach keyboard event listeners when screen is shown
+            attachKeyboardListeners();
+        }
+        
+        function attachKeyboardListeners() {
+            // Only attach once
+            if (window.keyboardListenersAttached) return;
+            window.keyboardListenersAttached = true;
+            
+            // Handle all SKU key buttons
+            document.querySelectorAll('.sku-key').forEach(button => {
+                button.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    const key = this.getAttribute('data-key');
+                    addToSKU(key);
+                }, { passive: false });
+                
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const key = this.getAttribute('data-key');
+                    addToSKU(key);
+                });
+            });
+            
+            // Backspace button
+            const btnBackspace = document.getElementById('btnBackspaceSKU');
+            if (btnBackspace) {
+                btnBackspace.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    backspaceSKU();
+                }, { passive: false });
+                btnBackspace.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    backspaceSKU();
+                });
+            }
+            
+            // Clear button
+            const btnClear = document.getElementById('btnClearSKU');
+            if (btnClear) {
+                btnClear.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    clearSKU();
+                }, { passive: false });
+                btnClear.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    clearSKU();
+                });
+            }
+            
+            console.log('Keyboard listeners attached');
         }
         
         function hideManualSearch() {
@@ -2478,6 +2485,63 @@
             a.download = 'PO_Review_' + session.name.replace(/\s+/g, '_') + '_' + new Date(session.startTime).toISOString().slice(0,10) + '.csv';
             a.click();
             URL.revokeObjectURL(url);
+        }
+        
+        // Count Sessions Sync Functions
+        async function saveCountSessionToDatabase(session) {
+            try {
+                const sessionData = {
+                    id: session.id,
+                    name: session.name,
+                    session_type: session.sortOrder ? 'physical_count' : (session.returnList ? 'audit' : (session.brandFilter !== undefined ? 'po_review' : 'manual_count')),
+                    start_time: session.startTime,
+                    end_time: session.endTime || null,
+                    completed: session.completed || false,
+                    sort_order: session.sortOrder || null,
+                    location_filter: session.locationFilter || null,
+                    brand_filter: session.brandFilter || null,
+                    session_data: session
+                };
+                
+                const { error } = await db.from('count_sessions').upsert(sessionData, { onConflict: 'id' });
+                if (error) {
+                    console.error('Error saving count session:', error);
+                    localStorage.setItem('countSessions', JSON.stringify(countSessions));
+                }
+            } catch (e) {
+                console.error('Error syncing count session:', e);
+                localStorage.setItem('countSessions', JSON.stringify(countSessions));
+            }
+        }
+        
+        async function loadCountSessionsFromDatabase() {
+            try {
+                const { data, error} = await db
+                    .from('count_sessions')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                if (data && data.length > 0) {
+                    countSessions = data.map(row => row.session_data);
+                    localStorage.setItem('countSessions', JSON.stringify(countSessions));
+                    return true;
+                } else {
+                    const savedSessions = localStorage.getItem('countSessions');
+                    if (savedSessions) {
+                        countSessions = JSON.parse(savedSessions);
+                    }
+                    return false;
+                }
+            } catch (e) {
+                console.error('Error loading count sessions:', e);
+                const savedSessions = localStorage.getItem('countSessions');
+                if (savedSessions) {
+                    countSessions = JSON.parse(savedSessions);
+                }
+                return false;
+            }
         }
 
         loadInventory();
