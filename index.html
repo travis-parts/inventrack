@@ -740,12 +740,15 @@
             document.getElementById('menuPanel').style.transform = 'translateX(-100%)';
         });
         
-        document.getElementById('btnRefresh').addEventListener('click', async function() {
-            this.textContent = '⟳';
-            await loadInventory();
-            this.textContent = '🔄';
-            showNotification('✓ Refreshed from database');
-        });
+        const btnRefresh = document.getElementById('btnRefresh');
+        if (btnRefresh) {
+            btnRefresh.addEventListener('click', async function() {
+                this.textContent = '⟳';
+                await loadInventory();
+                this.textContent = '🔄';
+                showNotification('✓ Refreshed from database');
+            });
+        }
 
         document.querySelectorAll('.menu-item').forEach(item => {
             item.addEventListener('click', function() {
