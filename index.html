@@ -201,11 +201,19 @@
                             </select>
                         </div>
                         
-                        <div style="margin-bottom: 20px;">
+                        <div style="margin-bottom: 16px;">
                             <label style="display: block; margin-bottom: 6px; font-weight: 600;">Filter by Location (Optional)</label>
                             <input type="text" id="locationFilter" placeholder="e.g., A1 (leave empty for all)" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; text-transform: uppercase;">
                             <small style="color: #64748b; font-size: 13px; display: block; margin-top: 6px;">
-                                Start typing location prefix to filter items (e.g., "A1" for all items in A1-*)
+                                Filter by location prefix (e.g., "A1" for all items in A1-*)
+                            </small>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 600;">Filter by Brand (Optional)</label>
+                            <input type="text" id="brandFilter" placeholder="e.g., V, MW, FD, GH (leave empty for all)" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; text-transform: uppercase;">
+                            <small style="color: #64748b; font-size: 13px; display: block; margin-top: 6px;">
+                                Filter by brand prefix (e.g., "V" for all V86089635-type items)
                             </small>
                         </div>
                         
@@ -1106,13 +1114,23 @@
             const sessionName = document.getElementById('sessionNameInput').value.trim() || 'Count Session';
             const sortOrder = document.getElementById('countSortOrder').value;
             const locationFilter = document.getElementById('locationFilter').value.trim().toUpperCase();
+            const brandFilter = document.getElementById('brandFilter').value.trim().toUpperCase();
             
             let itemsToCount = [...inventory];
             
+            // Apply location filter
             if (locationFilter) {
                 itemsToCount = itemsToCount.filter(item => 
                     item.location && item.location.toUpperCase().startsWith(locationFilter)
                 );
+            }
+            
+            // Apply brand filter (extract prefix before first number or dash)
+            if (brandFilter) {
+                itemsToCount = itemsToCount.filter(item => {
+                    const prefix = item.sku.match(/^([A-Z]+)/i);
+                    return prefix && prefix[1].toUpperCase() === brandFilter;
+                });
             }
             
             if (itemsToCount.length === 0) {
@@ -1132,6 +1150,7 @@
                 startTime: new Date().toISOString(),
                 sortOrder: sortOrder === 'location' ? 'Location' : 'SKU',
                 locationFilter: locationFilter || 'All',
+                brandFilter: brandFilter || 'All',
                 items: itemsToCount.map(item => ({
                     sku: item.sku,
                     description: item.description,
