@@ -56,7 +56,7 @@
             </div>
         </div>
 
-        <div style="padding: 12px; max-width: 1200px; margin: 0 auto;">
+        <div style="padding: 12px; max-width: 1200px; margin: 0 auto; overflow-x: hidden;">
             <div id="dashboard-tab" class="tab-content" style="display: block;">
                 <div id="notification" style="padding: 14px; margin-bottom: 16px; border-radius: 8px; font-weight: 500; display: none;"></div>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px;">
@@ -276,21 +276,19 @@
                     </div>
                     
                     <div id="manualSearchScreen" style="display: none;">
-                        <div style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 20px;">
-                            <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 16px;">Enter SKU:</h3>
+                        <div style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 16px;">
+                            <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">Enter SKU:</h3>
                             
-                            <!-- Real input field for device keyboard -->
                             <input type="text" 
                                    id="manualSKUInput" 
-                                   placeholder="Type or scan SKU..." 
+                                   placeholder="Type SKU..." 
                                    inputmode="numeric"
                                    autocapitalize="characters"
-                                   style="width: 100%; padding: 16px; border: 3px solid #3b82f6; border-radius: 10px; font-size: 20px; font-weight: 700; text-align: center; margin-bottom: 16px;">
+                                   style="width: 100%; max-width: 100%; box-sizing: border-box; padding: 14px; border: 3px solid #3b82f6; border-radius: 10px; font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 12px; display: block;">
                             
-                            <!-- Autocomplete dropdown -->
-                            <div id="quickMatchDropdown" style="max-height: 400px; overflow-y: auto; margin-bottom: 16px; display: none;"></div>
+                            <div id="quickMatchDropdown" style="max-height: 400px; overflow-y: auto; margin-bottom: 12px; display: none;"></div>
                             
-                            <button id="btnCancelManual" style="width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #64748b; color: white;">✕ Cancel</button>
+                            <button id="btnCancelManual" style="width: 100%; box-sizing: border-box; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #64748b; color: white;">✕ Cancel</button>
                         </div>
                     </div>
                 </div>
