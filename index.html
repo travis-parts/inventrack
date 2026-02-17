@@ -2586,20 +2586,27 @@
 
                 if (error) throw error;
 
+                console.log('Save successful, starting cleanup...');
+
                 // Update local inventory
                 await loadInventory();
 
+                console.log('Inventory reloaded');
+
                 // Show confirmation
                 stockEntrySessionCount++;
+                console.log('Session count:', stockEntrySessionCount);
                 document.getElementById('stockEntryCount').textContent = stockEntrySessionCount;
 
                 const lastSaved = document.getElementById('stockEntryLastSaved');
                 if (lastSaved) {
                     lastSaved.textContent = '✓ Saved: ' + sku + '  (QOH: ' + qoh + (min !== null ? '  Min: ' + min : '') + (max !== null ? '  Max: ' + max : '') + (location ? '  📍 ' + location : '') + ')';
                     lastSaved.style.display = 'block';
+                    console.log('Confirmation shown');
                 }
 
                 // Clear for next entry
+                console.log('Clearing fields...');
                 const skuField = document.getElementById('entrySKU');
                 const qohField = document.getElementById('entryQOH');
                 const minField = document.getElementById('entryMIN');
@@ -2607,16 +2614,27 @@
                 const locField = document.getElementById('entryLocation');
                 const warnField = document.getElementById('entrySkuWarning');
                 
-                if (skuField) skuField.value = '';
-                if (qohField) qohField.value = '0';
+                console.log('Fields found:', {sku: !!skuField, qoh: !!qohField, min: !!minField, max: !!maxField, loc: !!locField});
+                
+                if (skuField) {
+                    skuField.value = '';
+                    console.log('SKU cleared, value is now:', skuField.value);
+                }
+                if (qohField) {
+                    qohField.value = '0';
+                    console.log('QOH cleared, value is now:', qohField.value);
+                }
                 if (minField) minField.value = '';
                 if (maxField) maxField.value = '';
                 if (locField) locField.value = '';
                 if (warnField) warnField.style.display = 'none';
 
+                console.log('All fields cleared');
+
                 // Focus SKU field for next entry
                 setTimeout(() => {
                     if (skuField) skuField.focus();
+                    console.log('SKU field focused');
                 }, 200);
 
             } catch (e) {
