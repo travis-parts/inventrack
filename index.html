@@ -36,6 +36,9 @@
             <div class="menu-item" data-tab="inventory" style="padding: 18px 20px; border-bottom: 1px solid #e0e0e0; cursor: pointer; font-size: 16px; font-weight: 500;">
                 <span>📋</span> Inventory View
             </div>
+            <div class="menu-item" data-tab="stock-entry" style="padding: 18px 20px; border-bottom: 1px solid #e0e0e0; cursor: pointer; font-size: 16px; font-weight: 500; background: #f0fdf4;">
+                <span>➕</span> Stock Entry
+            </div>
             <div class="menu-item" data-tab="physical-count" style="padding: 18px 20px; border-bottom: 1px solid #e0e0e0; cursor: pointer; font-size: 16px; font-weight: 500;">
                 <span>📱</span> Physical Count
             </div>
@@ -586,6 +589,84 @@
                     <div id="reportsCount" style="color: #64748b; font-size: 14px; font-weight: 600;">0 reports</div>
                 </div>
                 <div id="reportsList"></div>
+            </div>
+
+            <div id="stock-entry-tab" class="tab-content" style="display: none;">
+                
+                <!-- Progress counter -->
+                <div style="background: #1e293b; color: white; padding: 14px 16px; border-radius: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="font-size: 15px; font-weight: 600;">📦 Stock Entry</div>
+                    <div style="font-size: 14px;">Added this session: <span id="stockEntryCount" style="font-weight: 700; color: #86efac;">0</span></div>
+                </div>
+
+                <!-- Last saved confirmation -->
+                <div id="stockEntryLastSaved" style="display: none; background: #d1fae5; border: 2px solid #10b981; padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 14px; font-weight: 600; color: #065f46; text-align: center;"></div>
+
+                <!-- Entry form -->
+                <div style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 20px;">
+                    
+                    <!-- SKU -->
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">SKU *</label>
+                        <input type="text" 
+                               id="entrySKU" 
+                               placeholder="e.g. V86089635"
+                               autocapitalize="characters"
+                               autocorrect="off"
+                               inputmode="numeric"
+                               style="width: 100%; box-sizing: border-box; padding: 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 20px; font-weight: 700; text-transform: uppercase;">
+                        <div id="entrySkuWarning" style="display: none; color: #ef4444; font-size: 13px; margin-top: 6px; font-weight: 600;">⚠️ SKU already exists - saving will update it</div>
+                    </div>
+
+                    <!-- QOH -->
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Qty on Hand *</label>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <button onclick="adjustEntryQty('qoh', -1)" style="width: 56px; height: 56px; border: none; border-radius: 10px; font-size: 28px; font-weight: 700; cursor: pointer; background: #ef4444; color: white; flex-shrink: 0; touch-action: manipulation;">−</button>
+                            <input type="number" id="entryQOH" value="0" min="0" inputmode="numeric"
+                                   style="flex: 1; padding: 14px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 24px; font-weight: 700; text-align: center;">
+                            <button onclick="adjustEntryQty('qoh', 1)" style="width: 56px; height: 56px; border: none; border-radius: 10px; font-size: 28px; font-weight: 700; cursor: pointer; background: #10b981; color: white; flex-shrink: 0; touch-action: manipulation;">+</button>
+                        </div>
+                    </div>
+
+                    <!-- MIN / MAX -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                        <div>
+                            <label style="display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Min Stock</label>
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <button onclick="adjustEntryQty('min', -1)" style="width: 40px; height: 48px; border: none; border-radius: 8px; font-size: 20px; font-weight: 700; cursor: pointer; background: #ef4444; color: white; touch-action: manipulation;">−</button>
+                                <input type="number" id="entryMIN" value="" placeholder="0" min="0" inputmode="numeric"
+                                       style="flex: 1; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 18px; font-weight: 700; text-align: center;">
+                                <button onclick="adjustEntryQty('min', 1)" style="width: 40px; height: 48px; border: none; border-radius: 8px; font-size: 20px; font-weight: 700; cursor: pointer; background: #10b981; color: white; touch-action: manipulation;">+</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Max Stock</label>
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <button onclick="adjustEntryQty('max', -1)" style="width: 40px; height: 48px; border: none; border-radius: 8px; font-size: 20px; font-weight: 700; cursor: pointer; background: #ef4444; color: white; touch-action: manipulation;">−</button>
+                                <input type="number" id="entryMAX" value="" placeholder="0" min="0" inputmode="numeric"
+                                       style="flex: 1; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 18px; font-weight: 700; text-align: center;">
+                                <button onclick="adjustEntryQty('max', 1)" style="width: 40px; height: 48px; border: none; border-radius: 8px; font-size: 20px; font-weight: 700; cursor: pointer; background: #10b981; color: white; touch-action: manipulation;">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Location -->
+                    <div style="margin-bottom: 24px;">
+                        <label style="display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Location</label>
+                        <input type="text" 
+                               id="entryLocation" 
+                               placeholder="e.g. A1-B2-C3"
+                               autocapitalize="characters"
+                               autocorrect="off"
+                               style="width: 100%; box-sizing: border-box; padding: 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 18px; font-weight: 600; text-transform: uppercase;">
+                    </div>
+
+                    <!-- Save button -->
+                    <button id="btnSaveStockEntry" style="width: 100%; padding: 20px; border: none; border-radius: 12px; font-size: 20px; font-weight: 700; cursor: pointer; background: #10b981; color: white; touch-action: manipulation;">
+                        ✓ Save &amp; New
+                    </button>
+                </div>
             </div>
 
             <div id="import-export-tab" class="tab-content" style="display: none;">
@@ -2442,6 +2523,99 @@
                     countSessions = JSON.parse(savedSessions);
                 }
                 return false;
+            }
+        }
+
+        // Stock Entry
+        let stockEntrySessionCount = 0;
+
+        function adjustEntryQty(field, delta) {
+            const ids = { qoh: 'entryQOH', min: 'entryMIN', max: 'entryMAX' };
+            const input = document.getElementById(ids[field]);
+            const current = parseInt(input.value) || 0;
+            const newVal = Math.max(0, current + delta);
+            input.value = newVal;
+        }
+
+        document.getElementById('entrySKU').addEventListener('input', function() {
+            const sku = this.value.trim().toUpperCase();
+            this.value = sku;
+            const existing = inventory.find(i => i.sku === sku);
+            const warning = document.getElementById('entrySkuWarning');
+            if (existing) {
+                warning.style.display = 'block';
+                // Pre-fill existing values
+                document.getElementById('entryQOH').value = existing.qtyOnHand || 0;
+                document.getElementById('entryMIN').value = existing.stockMin || '';
+                document.getElementById('entryMAX').value = existing.stockMax || '';
+                document.getElementById('entryLocation').value = existing.location || '';
+            } else {
+                warning.style.display = 'none';
+            }
+        });
+
+        document.getElementById('btnSaveStockEntry').addEventListener('click', saveStockEntry);
+
+        document.getElementById('entryLocation').addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+
+        async function saveStockEntry() {
+            const sku = document.getElementById('entrySKU').value.trim().toUpperCase();
+            if (!sku) {
+                showNotification('SKU is required', 'error');
+                document.getElementById('entrySKU').focus();
+                return;
+            }
+
+            const qoh = parseInt(document.getElementById('entryQOH').value) || 0;
+            const min = document.getElementById('entryMIN').value !== '' ? parseInt(document.getElementById('entryMIN').value) : null;
+            const max = document.getElementById('entryMAX').value !== '' ? parseInt(document.getElementById('entryMAX').value) : null;
+            const location = document.getElementById('entryLocation').value.trim().toUpperCase();
+
+            const btn = document.getElementById('btnSaveStockEntry');
+            btn.textContent = 'Saving...';
+            btn.disabled = true;
+
+            try {
+                const { error } = await db.from('inventory').upsert({
+                    sku,
+                    qty_on_hand: qoh,
+                    stock_min: min,
+                    stock_max: max,
+                    location: location,
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'sku' });
+
+                if (error) throw error;
+
+                // Update local inventory
+                await loadInventory();
+
+                // Show confirmation
+                stockEntrySessionCount++;
+                document.getElementById('stockEntryCount').textContent = stockEntrySessionCount;
+
+                const lastSaved = document.getElementById('stockEntryLastSaved');
+                lastSaved.textContent = '✓ Saved: ' + sku + '  (QOH: ' + qoh + (min !== null ? '  Min: ' + min : '') + (max !== null ? '  Max: ' + max : '') + (location ? '  📍 ' + location : '') + ')';
+                lastSaved.style.display = 'block';
+
+                // Clear for next entry
+                document.getElementById('entrySKU').value = '';
+                document.getElementById('entryQOH').value = '0';
+                document.getElementById('entryMIN').value = '';
+                document.getElementById('entryMAX').value = '';
+                document.getElementById('entryLocation').value = '';
+                document.getElementById('entrySkuWarning').style.display = 'none';
+
+                // Focus SKU field for next entry
+                setTimeout(() => document.getElementById('entrySKU').focus(), 100);
+
+            } catch (e) {
+                showNotification('Error: ' + e.message, 'error');
+            } finally {
+                btn.textContent = '✓ Save & New';
+                btn.disabled = false;
             }
         }
 
