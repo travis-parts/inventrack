@@ -2567,7 +2567,11 @@
             const location = document.getElementById('entryLocation').value.trim().toUpperCase();
 
             const btn = document.getElementById('btnSaveEntry');
-            btn.textContent = 'Saving...';
+            if (!btn) {
+                console.error('Save button not found!');
+                return;
+            }
+            btn.innerHTML = 'Saving...';
             btn.disabled = true;
 
             try {
@@ -2590,25 +2594,38 @@
                 document.getElementById('stockEntryCount').textContent = stockEntrySessionCount;
 
                 const lastSaved = document.getElementById('stockEntryLastSaved');
-                lastSaved.textContent = '✓ Saved: ' + sku + '  (QOH: ' + qoh + (min !== null ? '  Min: ' + min : '') + (max !== null ? '  Max: ' + max : '') + (location ? '  📍 ' + location : '') + ')';
-                lastSaved.style.display = 'block';
+                if (lastSaved) {
+                    lastSaved.textContent = '✓ Saved: ' + sku + '  (QOH: ' + qoh + (min !== null ? '  Min: ' + min : '') + (max !== null ? '  Max: ' + max : '') + (location ? '  📍 ' + location : '') + ')';
+                    lastSaved.style.display = 'block';
+                }
 
                 // Clear for next entry
-                document.getElementById('entrySKU').value = '';
-                document.getElementById('entryQOH').value = '0';
-                document.getElementById('entryMIN').value = '';
-                document.getElementById('entryMAX').value = '';
-                document.getElementById('entryLocation').value = '';
-                document.getElementById('entrySkuWarning').style.display = 'none';
+                const skuField = document.getElementById('entrySKU');
+                const qohField = document.getElementById('entryQOH');
+                const minField = document.getElementById('entryMIN');
+                const maxField = document.getElementById('entryMAX');
+                const locField = document.getElementById('entryLocation');
+                const warnField = document.getElementById('entrySkuWarning');
+                
+                if (skuField) skuField.value = '';
+                if (qohField) qohField.value = '0';
+                if (minField) minField.value = '';
+                if (maxField) maxField.value = '';
+                if (locField) locField.value = '';
+                if (warnField) warnField.style.display = 'none';
 
                 // Focus SKU field for next entry
-                setTimeout(() => document.getElementById('entrySKU').focus(), 100);
+                setTimeout(() => {
+                    if (skuField) skuField.focus();
+                }, 200);
 
             } catch (e) {
                 showNotification('Error: ' + e.message, 'error');
             } finally {
-                btn.textContent = '✓ Save & New';
-                btn.disabled = false;
+                if (btn) {
+                    btn.innerHTML = '✓ Save &amp; New';
+                    btn.disabled = false;
+                }
             }
         }
 
