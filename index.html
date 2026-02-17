@@ -621,33 +621,33 @@
                     <!-- QOH -->
                     <div style="margin-bottom: 16px;">
                         <label style="display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Qty on Hand *</label>
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <button onclick="adjustEntryQty('qoh', -1)" style="width: 56px; height: 56px; border: none; border-radius: 10px; font-size: 28px; font-weight: 700; cursor: pointer; background: #ef4444; color: white; flex-shrink: 0; touch-action: manipulation;">−</button>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <button onclick="adjustEntryQty('qoh', -1)" style="width: 48px; height: 48px; border: none; border-radius: 10px; font-size: 24px; font-weight: 700; cursor: pointer; background: #ef4444; color: white; flex-shrink: 0; touch-action: manipulation;">−</button>
                             <input type="number" id="entryQOH" value="0" min="0" inputmode="numeric"
-                                   style="flex: 1; padding: 14px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 24px; font-weight: 700; text-align: center;">
-                            <button onclick="adjustEntryQty('qoh', 1)" style="width: 56px; height: 56px; border: none; border-radius: 10px; font-size: 28px; font-weight: 700; cursor: pointer; background: #10b981; color: white; flex-shrink: 0; touch-action: manipulation;">+</button>
+                                   style="flex: 1; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 20px; font-weight: 700; text-align: center; min-width: 0;">
+                            <button onclick="adjustEntryQty('qoh', 1)" style="width: 48px; height: 48px; border: none; border-radius: 10px; font-size: 24px; font-weight: 700; cursor: pointer; background: #10b981; color: white; flex-shrink: 0; touch-action: manipulation;">+</button>
                         </div>
                     </div>
 
-                    <!-- MIN / MAX -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
-                        <div>
-                            <label style="display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Min Stock</label>
-                            <div style="display: flex; align-items: center; gap: 6px;">
-                                <button onclick="adjustEntryQty('min', -1)" style="width: 40px; height: 48px; border: none; border-radius: 8px; font-size: 20px; font-weight: 700; cursor: pointer; background: #ef4444; color: white; touch-action: manipulation;">−</button>
-                                <input type="number" id="entryMIN" value="" placeholder="0" min="0" inputmode="numeric"
-                                       style="flex: 1; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 18px; font-weight: 700; text-align: center;">
-                                <button onclick="adjustEntryQty('min', 1)" style="width: 40px; height: 48px; border: none; border-radius: 8px; font-size: 20px; font-weight: 700; cursor: pointer; background: #10b981; color: white; touch-action: manipulation;">+</button>
-                            </div>
+                    <!-- MIN -->
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Min Stock</label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <button onclick="adjustEntryQty('min', -1)" style="width: 48px; height: 48px; border: none; border-radius: 10px; font-size: 24px; font-weight: 700; cursor: pointer; background: #ef4444; color: white; flex-shrink: 0; touch-action: manipulation;">−</button>
+                            <input type="number" id="entryMIN" value="" placeholder="0" min="0" inputmode="numeric"
+                                   style="flex: 1; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 20px; font-weight: 700; text-align: center; min-width: 0;">
+                            <button onclick="adjustEntryQty('min', 1)" style="width: 48px; height: 48px; border: none; border-radius: 10px; font-size: 24px; font-weight: 700; cursor: pointer; background: #10b981; color: white; flex-shrink: 0; touch-action: manipulation;">+</button>
                         </div>
-                        <div>
-                            <label style="display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Max Stock</label>
-                            <div style="display: flex; align-items: center; gap: 6px;">
-                                <button onclick="adjustEntryQty('max', -1)" style="width: 40px; height: 48px; border: none; border-radius: 8px; font-size: 20px; font-weight: 700; cursor: pointer; background: #ef4444; color: white; touch-action: manipulation;">−</button>
-                                <input type="number" id="entryMAX" value="" placeholder="0" min="0" inputmode="numeric"
-                                       style="flex: 1; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 18px; font-weight: 700; text-align: center;">
-                                <button onclick="adjustEntryQty('max', 1)" style="width: 40px; height: 48px; border: none; border-radius: 8px; font-size: 20px; font-weight: 700; cursor: pointer; background: #10b981; color: white; touch-action: manipulation;">+</button>
-                            </div>
+                    </div>
+
+                    <!-- MAX -->
+                    <div style="margin-bottom: 24px;">
+                        <label style="display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Max Stock</label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <button onclick="adjustEntryQty('max', -1)" style="width: 48px; height: 48px; border: none; border-radius: 10px; font-size: 24px; font-weight: 700; cursor: pointer; background: #ef4444; color: white; flex-shrink: 0; touch-action: manipulation;">−</button>
+                            <input type="number" id="entryMAX" value="" placeholder="0" min="0" inputmode="numeric"
+                                   style="flex: 1; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 20px; font-weight: 700; text-align: center; min-width: 0;">
+                            <button onclick="adjustEntryQty('max', 1)" style="width: 48px; height: 48px; border: none; border-radius: 10px; font-size: 24px; font-weight: 700; cursor: pointer; background: #10b981; color: white; flex-shrink: 0; touch-action: manipulation;">+</button>
                         </div>
                     </div>
 
