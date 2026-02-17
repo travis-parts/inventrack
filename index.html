@@ -614,6 +614,7 @@
                                autocapitalize="characters"
                                autocorrect="off"
                                inputmode="numeric"
+                               oninput="this.value=this.value.toUpperCase(); checkExistingSKU(this.value);"
                                style="width: 100%; box-sizing: border-box; padding: 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 20px; font-weight: 700; text-transform: uppercase;">
                         <div id="entrySkuWarning" style="display: none; color: #ef4444; font-size: 13px; margin-top: 6px; font-weight: 600;">⚠️ SKU already exists - saving will update it</div>
                     </div>
@@ -659,11 +660,12 @@
                                placeholder="e.g. A1-B2-C3"
                                autocapitalize="characters"
                                autocorrect="off"
+                               oninput="this.value=this.value.toUpperCase();"
                                style="width: 100%; box-sizing: border-box; padding: 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 18px; font-weight: 600; text-transform: uppercase;">
                     </div>
 
                     <!-- Save button -->
-                    <button id="btnSaveStockEntry" style="width: 100%; padding: 20px; border: none; border-radius: 12px; font-size: 20px; font-weight: 700; cursor: pointer; background: #10b981; color: white; touch-action: manipulation;">
+                    <button onclick="saveStockEntry()" style="width: 100%; padding: 20px; border: none; border-radius: 12px; font-size: 20px; font-weight: 700; cursor: pointer; background: #10b981; color: white; touch-action: manipulation;">
                         ✓ Save &amp; New
                     </button>
                 </div>
@@ -2537,14 +2539,11 @@
             input.value = newVal;
         }
 
-        document.getElementById('entrySKU').addEventListener('input', function() {
-            const sku = this.value.trim().toUpperCase();
-            this.value = sku;
-            const existing = inventory.find(i => i.sku === sku);
+        function checkExistingSKU(sku) {
+            const existing = inventory.find(i => i.sku === sku.trim().toUpperCase());
             const warning = document.getElementById('entrySkuWarning');
             if (existing) {
                 warning.style.display = 'block';
-                // Pre-fill existing values
                 document.getElementById('entryQOH').value = existing.qtyOnHand || 0;
                 document.getElementById('entryMIN').value = existing.stockMin || '';
                 document.getElementById('entryMAX').value = existing.stockMax || '';
@@ -2552,13 +2551,7 @@
             } else {
                 warning.style.display = 'none';
             }
-        });
-
-        document.getElementById('btnSaveStockEntry').addEventListener('click', saveStockEntry);
-
-        document.getElementById('entryLocation').addEventListener('input', function() {
-            this.value = this.value.toUpperCase();
-        });
+        }
 
         async function saveStockEntry() {
             const sku = document.getElementById('entrySKU').value.trim().toUpperCase();
@@ -2573,7 +2566,8 @@
             const max = document.getElementById('entryMAX').value !== '' ? parseInt(document.getElementById('entryMAX').value) : null;
             const location = document.getElementById('entryLocation').value.trim().toUpperCase();
 
-            const btn = document.getElementById('btnSaveStockEntry');
+            const btn = document.querySelector('#stock-entry-tab button[onclick]');
+            const origText = btn.textContent;
             btn.textContent = 'Saving...';
             btn.disabled = true;
 
