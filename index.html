@@ -665,7 +665,7 @@
                     </div>
 
                     <!-- Save button -->
-                    <button onclick="saveStockEntry()" style="width: 100%; padding: 20px; border: none; border-radius: 12px; font-size: 20px; font-weight: 700; cursor: pointer; background: #10b981; color: white; touch-action: manipulation;">
+                    <button id="btnSaveEntry" onclick="saveStockEntry()" style="width: 100%; padding: 20px; border: none; border-radius: 12px; font-size: 20px; font-weight: 700; cursor: pointer; background: #10b981; color: white; touch-action: manipulation;">
                         ✓ Save &amp; New
                     </button>
                 </div>
@@ -2566,8 +2566,7 @@
             const max = document.getElementById('entryMAX').value !== '' ? parseInt(document.getElementById('entryMAX').value) : null;
             const location = document.getElementById('entryLocation').value.trim().toUpperCase();
 
-            const btn = document.querySelector('#stock-entry-tab button[onclick]');
-            const origText = btn.textContent;
+            const btn = document.getElementById('btnSaveEntry');
             btn.textContent = 'Saving...';
             btn.disabled = true;
 
