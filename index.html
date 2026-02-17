@@ -1400,9 +1400,20 @@
 
         // Scan Count Functions
         document.getElementById('btnStartScanCount').addEventListener('click', startScanCountSession);
-        document.getElementById('btnTakePicture').addEventListener('click', () => document.getElementById('cameraInput').click());
-        document.getElementById('cameraInput').addEventListener('change', handlePhotoCapture);
-        document.getElementById('btnManualSearch').addEventListener('click', showManualSearch);
+        const btnTakePicture = document.getElementById('btnTakePicture');
+        if (btnTakePicture) {
+            btnTakePicture.addEventListener('click', () => document.getElementById('cameraInput').click());
+        }
+        
+        const cameraInput = document.getElementById('cameraInput');
+        if (cameraInput) {
+            cameraInput.addEventListener('change', handlePhotoCapture);
+        }
+        
+        const btnManualSearch = document.getElementById('btnManualSearch');
+        if (btnManualSearch) {
+            btnManualSearch.addEventListener('click', showManualSearch);
+        }
         document.getElementById('btnCancelManual').addEventListener('click', hideManualSearch);
         document.getElementById('btnRescan').addEventListener('click', showScanCamera);
         document.getElementById('btnSaveScanCount').addEventListener('click', saveScanCount);
