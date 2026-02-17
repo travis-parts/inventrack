@@ -2596,13 +2596,21 @@
                 // Show confirmation
                 stockEntrySessionCount++;
                 console.log('Session count:', stockEntrySessionCount);
-                document.getElementById('stockEntryCount').textContent = stockEntrySessionCount;
+                const countEl = document.getElementById('stockEntryCount');
+                if (countEl) {
+                    countEl.textContent = stockEntrySessionCount;
+                    console.log('Counter updated');
+                } else {
+                    console.error('stockEntryCount element not found!');
+                }
 
                 const lastSaved = document.getElementById('stockEntryLastSaved');
                 if (lastSaved) {
                     lastSaved.textContent = '✓ Saved: ' + sku + '  (QOH: ' + qoh + (min !== null ? '  Min: ' + min : '') + (max !== null ? '  Max: ' + max : '') + (location ? '  📍 ' + location : '') + ')';
                     lastSaved.style.display = 'block';
                     console.log('Confirmation shown');
+                } else {
+                    console.error('stockEntryLastSaved element not found!');
                 }
 
                 // Clear for next entry
