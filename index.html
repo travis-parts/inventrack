@@ -602,8 +602,19 @@
                 <!-- Last saved confirmation -->
                 <div id="stockEntryLastSaved" style="display: none; background: #d1fae5; border: 2px solid #10b981; padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 14px; font-weight: 600; color: #065f46; text-align: center;"></div>
 
-                <!-- Entry form -->
-                <div style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 20px;">
+                <!-- Format Selector -->
+                <div style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 16px; margin-bottom: 16px;">
+                    <label style="display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">SKU Format</label>
+                    <select id="skuFormatSelector" onchange="switchSKUFormat(this.value)" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 16px; font-weight: 600; background: white;">
+                        <option value="manual">Manual Entry (any format)</option>
+                        <option value="GH">GH - Gates Adapter Fittings</option>
+                        <option value="MW" disabled>MW - (Coming Soon)</option>
+                        <option value="MC" disabled>MC - (Coming Soon)</option>
+                    </select>
+                </div>
+
+                <!-- Manual Entry Form (default) -->
+                <div id="manualEntryForm" style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 20px;">
                     
                     <!-- SKU -->
                     <div style="margin-bottom: 16px;">
@@ -666,6 +677,99 @@
 
                     <!-- Save button -->
                     <button id="btnSaveEntry" onclick="saveStockEntry()" style="width: 100%; padding: 20px; border: none; border-radius: 12px; font-size: 20px; font-weight: 700; cursor: pointer; background: #10b981; color: white; touch-action: manipulation;">
+                        ✓ Save &amp; New
+                    </button>
+                </div>
+
+                <!-- GH Format Entry Form (hidden by default) -->
+                <div id="ghEntryForm" style="display: none; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 20px;">
+                    
+                    <!-- First and Second Numbers (side by side) -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                        <div>
+                            <label style="display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">First # *</label>
+                            <input type="text" 
+                                   id="ghFirstNum" 
+                                   placeholder="4"
+                                   inputmode="numeric"
+                                   oninput="updateGHPreview()"
+                                   style="width: 100%; box-sizing: border-box; padding: 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 20px; font-weight: 700; text-align: center;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Second # *</label>
+                            <input type="text" 
+                                   id="ghSecondNum" 
+                                   placeholder="4"
+                                   inputmode="numeric"
+                                   oninput="updateGHPreview()"
+                                   style="width: 100%; box-sizing: border-box; padding: 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 20px; font-weight: 700; text-align: center;">
+                        </div>
+                    </div>
+
+                    <!-- Suffix Selector -->
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Suffix</label>
+                        <select id="ghSuffix" onchange="updateGHPreview()" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 16px; font-weight: 700; background: white;">
+                            <option value="MB">MB - Male Boss</option>
+                            <option value="MP">MP - Male Pipe</option>
+                            <option value="FPX">FPX - Female Pipe Swivel</option>
+                            <option value="FJX">FJX - Female JIC Swivel</option>
+                        </select>
+                    </div>
+
+                    <!-- Format Preview (moved here) -->
+                    <div style="background: #dbeafe; border: 2px solid #3b82f6; padding: 14px; border-radius: 10px; margin-bottom: 16px; text-align: center;">
+                        <div style="font-size: 11px; font-weight: 700; color: #1e40af; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px;">Preview</div>
+                        <div id="ghSKUPreview" style="font-size: 24px; font-weight: 700; color: #1e293b; font-family: monospace;">GH__G-__MB</div>
+                    </div>
+
+                    <!-- QOH -->
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Qty on Hand *</label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <button onclick="adjustGHQty('qoh', -1)" style="width: 48px; height: 48px; border: none; border-radius: 10px; font-size: 24px; font-weight: 700; cursor: pointer; background: #ef4444; color: white; flex-shrink: 0; touch-action: manipulation;">−</button>
+                            <input type="number" id="ghQOH" value="0" min="0" inputmode="numeric"
+                                   style="flex: 1; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 20px; font-weight: 700; text-align: center; min-width: 0;">
+                            <button onclick="adjustGHQty('qoh', 1)" style="width: 48px; height: 48px; border: none; border-radius: 10px; font-size: 24px; font-weight: 700; cursor: pointer; background: #10b981; color: white; flex-shrink: 0; touch-action: manipulation;">+</button>
+                        </div>
+                    </div>
+
+                    <!-- MIN -->
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Min Stock</label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <button onclick="adjustGHQty('min', -1)" style="width: 48px; height: 48px; border: none; border-radius: 10px; font-size: 24px; font-weight: 700; cursor: pointer; background: #ef4444; color: white; flex-shrink: 0; touch-action: manipulation;">−</button>
+                            <input type="number" id="ghMIN" value="" placeholder="0" min="0" inputmode="numeric"
+                                   style="flex: 1; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 20px; font-weight: 700; text-align: center; min-width: 0;">
+                            <button onclick="adjustGHQty('min', 1)" style="width: 48px; height: 48px; border: none; border-radius: 10px; font-size: 24px; font-weight: 700; cursor: pointer; background: #10b981; color: white; flex-shrink: 0; touch-action: manipulation;">+</button>
+                        </div>
+                    </div>
+
+                    <!-- MAX -->
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Max Stock</label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <button onclick="adjustGHQty('max', -1)" style="width: 48px; height: 48px; border: none; border-radius: 10px; font-size: 24px; font-weight: 700; cursor: pointer; background: #ef4444; color: white; flex-shrink: 0; touch-action: manipulation;">−</button>
+                            <input type="number" id="ghMAX" value="" placeholder="0" min="0" inputmode="numeric"
+                                   style="flex: 1; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 20px; font-weight: 700; text-align: center; min-width: 0;">
+                            <button onclick="adjustGHQty('max', 1)" style="width: 48px; height: 48px; border: none; border-radius: 10px; font-size: 24px; font-weight: 700; cursor: pointer; background: #10b981; color: white; flex-shrink: 0; touch-action: manipulation;">+</button>
+                        </div>
+                    </div>
+
+                    <!-- Location -->
+                    <div style="margin-bottom: 24px;">
+                        <label style="display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Location</label>
+                        <input type="text" 
+                               id="ghLocation" 
+                               placeholder="e.g. A1-B2-C3"
+                               autocapitalize="characters"
+                               autocorrect="off"
+                               oninput="this.value=this.value.toUpperCase();"
+                               style="width: 100%; box-sizing: border-box; padding: 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 18px; font-weight: 600; text-transform: uppercase;">
+                    </div>
+
+                    <!-- Save button -->
+                    <button id="btnSaveGH" onclick="saveGHEntry()" style="width: 100%; padding: 20px; border: none; border-radius: 12px; font-size: 20px; font-weight: 700; cursor: pointer; background: #10b981; color: white; touch-action: manipulation;">
                         ✓ Save &amp; New
                     </button>
                 </div>
@@ -814,6 +918,14 @@
                 if (tab === 'dashboard') updateDashboard();
                 if (tab === 'inventory') displayInventory();
                 if (tab === 'count-reports') displayCountReports();
+                if (tab === 'stock-entry') {
+                    // Restore last used format when entering Stock Entry
+                    const selector = document.getElementById('skuFormatSelector');
+                    if (selector && lastUsedFormat) {
+                        selector.value = lastUsedFormat;
+                        switchSKUFormat(lastUsedFormat);
+                    }
+                }
             });
         });
 
@@ -1414,10 +1526,26 @@
         if (btnManualSearch) {
             btnManualSearch.addEventListener('click', showManualSearch);
         }
-        document.getElementById('btnCancelManual').addEventListener('click', hideManualSearch);
-        document.getElementById('btnRescan').addEventListener('click', showScanCamera);
-        document.getElementById('btnSaveScanCount').addEventListener('click', saveScanCount);
-        document.getElementById('btnCancelScan').addEventListener('click', cancelScanCount);
+        
+        const btnCancelManual = document.getElementById('btnCancelManual');
+        if (btnCancelManual) {
+            btnCancelManual.addEventListener('click', hideManualSearch);
+        }
+        
+        const btnRescan = document.getElementById('btnRescan');
+        if (btnRescan) {
+            btnRescan.addEventListener('click', showScanCamera);
+        }
+        
+        const btnSaveScanCount = document.getElementById('btnSaveScanCount');
+        if (btnSaveScanCount) {
+            btnSaveScanCount.addEventListener('click', saveScanCount);
+        }
+        
+        const btnCancelScan = document.getElementById('btnCancelScan');
+        if (btnCancelScan) {
+            btnCancelScan.addEventListener('click', cancelScanCount);
+        }
         document.getElementById('btnFinishScanCount').addEventListener('click', finishScanCountSession);
         
         document.getElementById('btnScanMinus').addEventListener('click', () => {
@@ -1641,9 +1769,22 @@
         function resetCameraScreen() {
             const cameraScreen = document.getElementById('scanCameraScreen');
             cameraScreen.innerHTML = '<div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;"><div style="font-size: 48px; margin-bottom: 16px;">📷</div><h3 style="font-size: 20px; font-weight: 600; margin-bottom: 12px;">Scan Item Label</h3><p style="color: #64748b; margin-bottom: 20px;">Point camera at SKU/Part Number</p><input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;"><button id="btnTakePicture" style="width: 100%; padding: 20px; border: none; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white; margin-bottom: 12px;">📸 Take Picture</button><button id="btnManualSearch" style="width: 100%; padding: 16px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #f1f5f9; color: #64748b;">⌨️ Type SKU Manually</button></div>';
-            document.getElementById('btnTakePicture').addEventListener('click', () => document.getElementById('cameraInput').click());
-            document.getElementById('cameraInput').addEventListener('change', handlePhotoCapture);
-            document.getElementById('btnManualSearch').addEventListener('click', showManualSearch);
+            
+            // Attach event listeners to newly created elements
+            const btnTakePic = document.getElementById('btnTakePicture');
+            if (btnTakePic) {
+                btnTakePic.addEventListener('click', () => document.getElementById('cameraInput').click());
+            }
+            
+            const camInput = document.getElementById('cameraInput');
+            if (camInput) {
+                camInput.addEventListener('change', handlePhotoCapture);
+            }
+            
+            const btnManual = document.getElementById('btnManualSearch');
+            if (btnManual) {
+                btnManual.addEventListener('click', showManualSearch);
+            }
         }
         
         function extractSKUs(text) {
@@ -2541,6 +2682,129 @@
 
         // Stock Entry
         let stockEntrySessionCount = 0;
+        let ghLastUsedSuffix = localStorage.getItem('ghLastSuffix') || 'MB';
+        let lastUsedFormat = localStorage.getItem('skuFormat') || 'manual';
+
+        function switchSKUFormat(format) {
+            if (format === 'GH') {
+                document.getElementById('manualEntryForm').style.display = 'none';
+                document.getElementById('ghEntryForm').style.display = 'block';
+                // Restore last used suffix
+                document.getElementById('ghSuffix').value = ghLastUsedSuffix;
+                updateGHPreview();
+            } else {
+                document.getElementById('manualEntryForm').style.display = 'block';
+                document.getElementById('ghEntryForm').style.display = 'none';
+            }
+            
+            // Save format preference
+            lastUsedFormat = format;
+            localStorage.setItem('skuFormat', format);
+        }
+
+        function updateGHPreview() {
+            const first = document.getElementById('ghFirstNum').value || '__';
+            const second = document.getElementById('ghSecondNum').value || '__';
+            const suffix = document.getElementById('ghSuffix').value;
+            
+            const preview = 'GH' + first + 'G-' + second + suffix;
+            document.getElementById('ghSKUPreview').textContent = preview;
+            
+            // Save last used suffix
+            ghLastUsedSuffix = suffix;
+            localStorage.setItem('ghLastSuffix', suffix);
+        }
+
+        function adjustGHQty(field, delta) {
+            const ids = { qoh: 'ghQOH', min: 'ghMIN', max: 'ghMAX' };
+            const input = document.getElementById(ids[field]);
+            const current = parseInt(input.value) || 0;
+            const newVal = Math.max(0, current + delta);
+            input.value = newVal;
+        }
+
+        async function saveGHEntry() {
+            const first = document.getElementById('ghFirstNum').value.trim();
+            const second = document.getElementById('ghSecondNum').value.trim();
+            
+            if (!first || !second) {
+                showNotification('Please enter both numbers', 'error');
+                return;
+            }
+
+            const suffix = document.getElementById('ghSuffix').value;
+            const sku = 'GH' + first + 'G-' + second + suffix;
+            const qoh = parseInt(document.getElementById('ghQOH').value) || 0;
+            const min = document.getElementById('ghMIN').value !== '' ? parseInt(document.getElementById('ghMIN').value) : null;
+            const max = document.getElementById('ghMAX').value !== '' ? parseInt(document.getElementById('ghMAX').value) : null;
+            const location = document.getElementById('ghLocation').value.trim().toUpperCase();
+
+            const btn = document.getElementById('btnSaveGH');
+            if (!btn) return;
+            btn.innerHTML = 'Saving...';
+            btn.disabled = true;
+
+            try {
+                const { error } = await db.from('inventory').upsert({
+                    sku,
+                    qty_on_hand: qoh,
+                    stock_min: min,
+                    stock_max: max,
+                    location: location,
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'sku' });
+
+                if (error) throw error;
+
+                console.log('GH Save successful, starting cleanup...');
+
+                await loadInventory();
+
+                console.log('GH Inventory reloaded');
+
+                stockEntrySessionCount++;
+                console.log('GH Session count:', stockEntrySessionCount);
+                const countEl = document.getElementById('stockEntryCount');
+                if (countEl) {
+                    countEl.textContent = stockEntrySessionCount;
+                    console.log('GH Counter updated');
+                } else {
+                    console.error('GH stockEntryCount element not found!');
+                }
+
+                const lastSaved = document.getElementById('stockEntryLastSaved');
+                if (lastSaved) {
+                    lastSaved.textContent = '✓ Saved: ' + sku + '  (QOH: ' + qoh + (min !== null ? '  Min: ' + min : '') + (max !== null ? '  Max: ' + max : '') + (location ? '  📍 ' + location : '') + ')';
+                    lastSaved.style.display = 'block';
+                    console.log('GH Confirmation shown');
+                } else {
+                    console.error('GH stockEntryLastSaved element not found!');
+                }
+
+                // Clear first and second numbers only (keep suffix, QOH starts at 0, keep min/max, keep location)
+                console.log('GH Clearing number fields...');
+                document.getElementById('ghFirstNum').value = '';
+                document.getElementById('ghSecondNum').value = '';
+                document.getElementById('ghQOH').value = '0';
+                console.log('GH Fields cleared');
+                // Don't clear: suffix, min, max, location
+                
+                updateGHPreview();
+                
+                setTimeout(() => {
+                    document.getElementById('ghFirstNum').focus();
+                    console.log('GH First number focused');
+                }, 100);
+
+            } catch (e) {
+                showNotification('Error: ' + e.message, 'error');
+            } finally {
+                if (btn) {
+                    btn.innerHTML = '✓ Save &amp; New';
+                    btn.disabled = false;
+                }
+            }
+        }
 
         function adjustEntryQty(field, delta) {
             const ids = { qoh: 'entryQOH', min: 'entryMIN', max: 'entryMAX' };
