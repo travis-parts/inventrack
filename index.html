@@ -692,7 +692,7 @@
                                    id="ghFirstNum" 
                                    placeholder="4"
                                    inputmode="numeric"
-                                   oninput="updateGHPreview()"
+                                   oninput="updateGHPreview(); checkGHExists();"
                                    style="width: 100%; box-sizing: border-box; padding: 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 20px; font-weight: 700; text-align: center;">
                         </div>
                         <div>
@@ -701,15 +701,17 @@
                                    id="ghSecondNum" 
                                    placeholder="4"
                                    inputmode="numeric"
-                                   oninput="updateGHPreview()"
+                                   oninput="updateGHPreview(); checkGHExists();"
                                    style="width: 100%; box-sizing: border-box; padding: 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 20px; font-weight: 700; text-align: center;">
                         </div>
                     </div>
+                    
+                    <div id="ghSkuWarning" style="display: none; background: #fef3c7; border: 2px solid #f59e0b; color: #92400e; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 13px; font-weight: 600; text-align: center;">⚠️ SKU exists - saving will update it</div>
 
                     <!-- Suffix Selector -->
                     <div style="margin-bottom: 16px;">
                         <label style="display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Suffix</label>
-                        <select id="ghSuffix" onchange="updateGHPreview()" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 16px; font-weight: 700; background: white;">
+                        <select id="ghSuffix" onchange="updateGHPreview(); checkGHExists();" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 16px; font-weight: 700; background: white;">
                             <option value="MP">MP - Male Pipe</option>
                             <option value="MJ">MJ - Male JIC</option>
                             <option value="MFFOR">MFFOR - Male FFOR</option>
@@ -722,8 +724,6 @@
                             <option value="FJX90">FJX90 - Female JIC Swivel 90°</option>
                             <option value="FJX45">FJX45 - Female JIC Swivel 45°</option>
                             <option value="FFORX">FFORX - Female FFOR Swivel</option>
-                            <option value="FFORX45">FFORX45 - FFORX 45 Swivel</option>
-                            <option value="FFORX90">FFORX 90 - FFORX 90 Swivel</option>
                             <option value="FBSPORX">FBSPORX - Female BSPP O-Ring Swivel</option>
                             <option value="FBSPORX45">FBSPORX45 - Female BSPP O-Ring Swivel 45°</option>
                             <option value="FBSPORX90">FBSPORX90 - Female BSPP O-Ring Swivel 90°</option>
@@ -2732,6 +2732,31 @@
             // Save last used suffix
             ghLastUsedSuffix = suffix;
             localStorage.setItem('ghLastSuffix', suffix);
+        }
+
+        function checkGHExists() {
+            const first = document.getElementById('ghFirstNum').value.trim();
+            const second = document.getElementById('ghSecondNum').value.trim();
+            const suffix = document.getElementById('ghSuffix').value;
+            
+            if (!first || !second) {
+                document.getElementById('ghSkuWarning').style.display = 'none';
+                return;
+            }
+            
+            const sku = 'GH' + first + 'G-' + second + suffix;
+            const existing = inventory.find(i => i.sku === sku);
+            
+            if (existing) {
+                document.getElementById('ghSkuWarning').style.display = 'block';
+                // Pre-fill existing values
+                document.getElementById('ghQOH').value = existing.qtyOnHand || 0;
+                document.getElementById('ghMIN').value = existing.stockMin || '';
+                document.getElementById('ghMAX').value = existing.stockMax || '';
+                document.getElementById('ghLocation').value = existing.location || '';
+            } else {
+                document.getElementById('ghSkuWarning').style.display = 'none';
+            }
         }
 
         function adjustGHQty(field, delta) {
