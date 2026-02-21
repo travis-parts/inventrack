@@ -57,6 +57,9 @@
             <div class="menu-item" data-tab="import-export" style="padding: 18px 20px; border-bottom: 1px solid #e0e0e0; cursor: pointer; font-size: 16px; font-weight: 500;">
                 <span>📁</span> Import/Export
             </div>
+            <div class="menu-item" data-tab="qb-reconcile" style="padding: 18px 20px; border-bottom: 1px solid #e0e0e0; cursor: pointer; font-size: 16px; font-weight: 500; background: #fefce8;">
+                <span>🔄</span> QB Reconcile
+            </div>
         </div>
 
         <div style="padding: 12px; max-width: 1200px; margin: 0 auto; overflow-x: hidden;">
@@ -712,29 +715,33 @@
                     <div style="margin-bottom: 16px;">
                         <label style="display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Suffix</label>
                         <select id="ghSuffix" onchange="updateGHPreview(); checkGHExists();" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 16px; font-weight: 700; background: white;">
-                            <option value="MP">MP - Male Pipe</option>
-                            <option value="MJ">MJ - Male JIC</option>
-                            <option value="MFFOR">MFFOR - Male FFOR</option>
-                            <option value="MB">MB - Male Boss</option>
-                            <option value="MBX90">MBX90 - Male Boss 90°</option>
-                            <option value="MBX90BL">MBX90BL - Male Boss 90° Branch</option>
-                            <option value="MBSPP">MBSPP - Male Boss Split Flange</option>
-                            <option value="FPX">FPX - Female Pipe Swivel</option>
-                            <option value="FJX">FJX - Female JIC Swivel</option>
-                            <option value="FJX90">FJX90 - Female JIC Swivel 90°</option>
-                            <option value="FJX45">FJX45 - Female JIC Swivel 45°</option>
-                            <option value="FFORX">FFORX - Female FFOR Swivel</option>
-                            <option value="FBSPORX">FBSPORX - Female BSPP O-Ring Swivel</option>
-                            <option value="FFORX45">FFORX45</option>
-                            <option value="FFORD90">FFORX90</option>
-                            <option value="FBSPORX45">FBSPORX45 - Female BSPP O-Ring Swivel 45°</option>
-                            <option value="FBSPORX90">FBSPORX90 - Female BSPP O-Ring Swivel 90°</option>
-                            <option value="MDL">MDL - Male Dual Lock</option>
-                            <option value="FDLORX">FDLORX - Female Dual Lock O-Ring Swivel</option>
-                            <option value="FDLORX45">FDLORX45 - Female Dual Lock O-Ring Swivel 45°</option>
-                            <option value="FDLORX90">FDLORX90 - Female Dual Lock O-Ring Swivel 90°</option>
-                            <option value="MDH">MDH - Male Dual Hex</option>
-                            <option value="FDHORX90">FDHORX90 - Female Dual Hex O-Ring Swivel 90°</option>
+                            <optgroup label="F - Female">
+                                <option value="FBSPORX">FBSPORX</option>
+                                <option value="FBSPORX45">FBSPORX45</option>
+                                <option value="FBSPORX90">FBSPORX90</option>
+                                <option value="FDHORX90">FDHORX90</option>
+                                <option value="FDLORX">FDLORX</option>
+                                <option value="FDLORX45">FDLORX45</option>
+                                <option value="FDLORX90">FDLORX90</option>
+                                <option value="FFORX">FFORX</option>
+                                <option value="FFORX45">FFORX45</option>
+                                <option value="FFORX90">FFORX90</option>
+                                <option value="FJX">FJX</option>
+                                <option value="FJX45">FJX45</option>
+                                <option value="FJX90">FJX90</option>
+                                <option value="FPX">FPX</option>
+                            </optgroup>
+                            <optgroup label="M - Male">
+                                <option value="MB">MB</option>
+                                <option value="MBSPP">MBSPP</option>
+                                <option value="MBX90">MBX90</option>
+                                <option value="MBX90BL">MBX90BL</option>
+                                <option value="MDH">MDH</option>
+                                <option value="MDL">MDL</option>
+                                <option value="MFFOR">MFFOR</option>
+                                <option value="MJ">MJ</option>
+                                <option value="MP">MP</option>
+                            </optgroup>
                         </select>
                     </div>
 
@@ -812,6 +819,152 @@
                     </div>
                 </div>
             </div>
+            <!-- QB RECONCILE TAB -->
+            <div id="qb-reconcile-tab" class="tab-content" style="display: none;">
+
+                <!-- UPLOAD SCREEN (shown when no active session) -->
+                <div id="qbUploadScreen">
+                    <div style="background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 16px;">
+                        <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 8px;">🔄 QB Reconcile</h2>
+                        <p style="color: #64748b; margin-bottom: 20px; font-size: 14px; line-height: 1.6;">
+                            Upload your QuickBooks export on any device. Then walk the warehouse and verify each part from any device — quantities sync live through the cloud.
+                        </p>
+
+                        <!-- Active sessions list -->
+                        <div id="qbActiveSessionsArea" style="margin-bottom: 20px; display: none;">
+                            <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 10px; color: #1e293b;">📋 Active Sessions</h3>
+                            <div id="qbActiveSessionsList"></div>
+                        </div>
+
+                        <div style="background: #fef9c3; border: 2px solid #fde047; padding: 14px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; color: #713f12;">
+                            <strong>📄 CSV Format:</strong> Your QuickBooks export should have these columns:<br>
+                            <code style="display: block; margin-top: 6px; background: #fff; padding: 6px 10px; border-radius: 4px; font-size: 12px;">SKU, Description, QB_Qty</code>
+                            Example row: <code>GH4G-4MB, GH Fitting, 12</code>
+                        </div>
+
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 600;">Session Name</label>
+                            <input type="text" id="qbSessionName" placeholder="e.g., QB Reconcile Feb 2026" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 600;">Upload QuickBooks CSV</label>
+                            <button onclick="document.getElementById('qbCSVFile').click()" style="width: 100%; padding: 14px; border: 2px dashed #cbd5e1; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #f8fafc; color: #475569;">📂 Choose CSV File</button>
+                            <input type="file" id="qbCSVFile" accept=".csv" style="display: none;" onchange="qbHandleFileUpload(event)">
+                            <div id="qbFileStatus" style="margin-top: 8px; font-size: 13px; color: #64748b; display: none;"></div>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 600;">— or Paste CSV Data —</label>
+                            <textarea id="qbCSVPaste" rows="6" placeholder="SKU,Description,QB_Qty&#10;GH4G-4MB,GH Fitting,12&#10;P165789,Filter Element,50" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; font-family: monospace; box-sizing: border-box;"></textarea>
+                        </div>
+
+                        <button onclick="qbStartSession()" style="width: 100%; padding: 16px; border: none; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; background: #f59e0b; color: white;">🚀 Upload & Start Session</button>
+                    </div>
+                </div>
+
+                <!-- RECONCILE SESSION SCREEN -->
+                <div id="qbSessionScreen" style="display: none;">
+
+                    <!-- Header bar -->
+                    <div style="background: white; padding: 14px 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <div>
+                                <div style="font-size: 16px; font-weight: 700;" id="qbActiveSessionName">QB Reconcile</div>
+                                <div style="font-size: 13px; color: #64748b; margin-top: 2px;">
+                                    Verified: <span id="qbVerifiedCount" style="font-weight: 700; color: #10b981;">0</span> / <span id="qbTotalCount" style="font-weight: 700;">0</span>
+                                    &nbsp;|&nbsp; ⚠️ <span id="qbDiscrepancyCount" style="font-weight: 700; color: #ef4444;">0</span> discrepancies
+                                </div>
+                            </div>
+                            <button onclick="qbFinishSession()" style="padding: 10px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; background: #10b981; color: white;">✓ Finish</button>
+                        </div>
+                        <!-- Progress bar -->
+                        <div style="background: #e2e8f0; border-radius: 4px; height: 8px; overflow: hidden;">
+                            <div id="qbProgressBar" style="height: 100%; background: linear-gradient(90deg, #10b981, #3b82f6); border-radius: 4px; transition: width 0.3s; width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Filter/Search bar -->
+                    <div style="background: white; padding: 12px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 16px;">
+                        <input type="text" id="qbSearchBox" placeholder="🔍 Search SKU or description..." oninput="qbRenderList()" style="width: 100%; padding: 12px 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; box-sizing: border-box; margin-bottom: 10px;">
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button onclick="qbSetFilter('all')" id="qbFilterAll" style="flex: 1; padding: 8px; border: 2px solid #3b82f6; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white; min-width: 70px;">All</button>
+                            <button onclick="qbSetFilter('pending')" id="qbFilterPending" style="flex: 1; padding: 8px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; background: white; color: #64748b; min-width: 70px;">Pending</button>
+                            <button onclick="qbSetFilter('ok')" id="qbFilterOk" style="flex: 1; padding: 8px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; background: white; color: #64748b; min-width: 70px;">✓ Match</button>
+                            <button onclick="qbSetFilter('diff')" id="qbFilterDiff" style="flex: 1; padding: 8px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; background: white; color: #64748b; min-width: 70px;">⚠️ Diff</button>
+                        </div>
+                    </div>
+
+                    <!-- Item list -->
+                    <div id="qbItemList"></div>
+
+                </div>
+
+                <!-- ITEM VERIFY CARD (modal-style overlay) -->
+                <div id="qbVerifyCard" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 3000; display: none; align-items: center; justify-content: center; padding: 16px;">
+                    <div style="background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 480px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <div style="font-size: 26px; font-weight: 800; color: #1e293b; margin-bottom: 4px;" id="qbVerifySKU"></div>
+                            <div style="font-size: 15px; color: #64748b; margin-bottom: 10px;" id="qbVerifyDesc"></div>
+                            <div id="qbVerifyLocationBadge" style="display: inline-block; padding: 4px 12px; background: #e0f2fe; border-radius: 20px; font-size: 12px; font-weight: 600; color: #0369a1;"></div>
+                        </div>
+
+                        <!-- Three columns: QB Qty | InvenTrack Qty | Variance -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                            <div style="background: #fef9c3; padding: 14px 10px; border-radius: 10px; text-align: center;">
+                                <div style="font-size: 11px; font-weight: 700; color: #713f12; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">QuickBooks</div>
+                                <div style="font-size: 28px; font-weight: 800; color: #713f12;" id="qbVerifyQBQty">-</div>
+                            </div>
+                            <div style="background: #dbeafe; padding: 14px 10px; border-radius: 10px; text-align: center;">
+                                <div style="font-size: 11px; font-weight: 700; color: #1e40af; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">InvenTrack</div>
+                                <div style="font-size: 28px; font-weight: 800; color: #1e40af;" id="qbVerifyITQty">-</div>
+                            </div>
+                            <div id="qbVerifyVarianceBox" style="padding: 14px 10px; border-radius: 10px; text-align: center;">
+                                <div style="font-size: 11px; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;" id="qbVerifyVarianceLabel">Variance</div>
+                                <div style="font-size: 28px; font-weight: 800;" id="qbVerifyVarianceVal">-</div>
+                            </div>
+                        </div>
+
+                        <!-- Actual count entry -->
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Your Physical Count</label>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <button onclick="qbAdjustCount(-1)" style="width: 60px; height: 60px; border: none; border-radius: 10px; font-size: 28px; font-weight: 700; cursor: pointer; background: #ef4444; color: white; flex-shrink: 0; touch-action: manipulation;">−</button>
+                                <input type="number" id="qbActualCount" value="0" min="0" inputmode="numeric" style="flex: 1; height: 60px; padding: 0; border: 3px solid #3b82f6; border-radius: 10px; font-size: 30px; font-weight: 800; text-align: center;" onclick="this.select()">
+                                <button onclick="qbAdjustCount(1)" style="width: 60px; height: 60px; border: none; border-radius: 10px; font-size: 28px; font-weight: 700; cursor: pointer; background: #10b981; color: white; flex-shrink: 0; touch-action: manipulation;">+</button>
+                            </div>
+                        </div>
+
+                        <!-- Notes field -->
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Notes (optional)</label>
+                            <input type="text" id="qbVerifyNotes" placeholder="e.g. found in wrong location" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 15px; box-sizing: border-box;">
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <button onclick="qbCancelVerify()" style="padding: 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; background: white; color: #64748b;">✕ Cancel</button>
+                            <button onclick="qbSaveVerify()" style="padding: 16px; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">✓ Save</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RESULTS SCREEN -->
+                <div id="qbResultsScreen" style="display: none;">
+                    <div style="background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 16px;">
+                        <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 4px;" id="qbResultsTitle">Reconcile Complete</h2>
+                        <div style="font-size: 13px; color: #64748b; margin-bottom: 20px;" id="qbResultsDate"></div>
+                        <div id="qbResultsSummary" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px;"></div>
+                        <div id="qbResultsDetail"></div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px;">
+                            <button onclick="qbExportResults()" style="padding: 14px; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; background: #3b82f6; color: white;">📥 Export CSV</button>
+                            <button onclick="qbNewSession()" style="padding: 14px; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; background: #64748b; color: white;">🔄 New Session</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- END QB RECONCILE TAB -->
+
         </div>
     </div>
 
@@ -2977,6 +3130,546 @@
         }
 
         loadInventory();
+
+        // ============================================================
+        //  QB RECONCILE - Full Feature
+        // ============================================================
+
+        let qbCurrentSession = null;       // session object in memory
+        let qbCurrentFilter  = 'all';      // 'all' | 'pending' | 'ok' | 'diff'
+        let qbVerifyingSKU   = null;       // sku currently open in verify card
+
+        // ---- Supabase helpers ----
+        async function qbSaveSessionToCloud(session) {
+            const payload = {
+                session_id:   session.id,
+                session_name: session.name,
+                created_at:   session.createdAt,
+                status:       session.status,
+                items:        JSON.stringify(session.items)
+            };
+            const { error } = await db
+                .from('qb_reconcile_sessions')
+                .upsert(payload, { onConflict: 'session_id' });
+            if (error) console.error('QB cloud save error:', error.message);
+        }
+
+        async function qbLoadSessionsFromCloud() {
+            try {
+                const { data, error } = await db
+                    .from('qb_reconcile_sessions')
+                    .select('*')
+                    .eq('status', 'active')
+                    .order('created_at', { ascending: false });
+                if (error) throw error;
+                return (data || []).map(row => ({
+                    id:        row.session_id,
+                    name:      row.session_name,
+                    createdAt: row.created_at,
+                    status:    row.status,
+                    items:     JSON.parse(row.items || '[]')
+                }));
+            } catch (e) {
+                console.error('QB load sessions error:', e.message);
+                return [];
+            }
+        }
+
+        async function qbMarkSessionFinished(sessionId) {
+            const { error } = await db
+                .from('qb_reconcile_sessions')
+                .update({ status: 'finished' })
+                .eq('session_id', sessionId);
+            if (error) console.error('QB finish error:', error.message);
+        }
+
+        // ---- Called when QB Reconcile tab is opened ----
+        async function qbInitTab() {
+            showLoading(true, 'Loading reconcile sessions...');
+            try {
+                const sessions = await qbLoadSessionsFromCloud();
+                const area = document.getElementById('qbActiveSessionsArea');
+                const list = document.getElementById('qbActiveSessionsList');
+
+                if (sessions.length > 0) {
+                    area.style.display = 'block';
+                    let html = '';
+                    sessions.forEach(s => {
+                        const total    = s.items.length;
+                        const verified = s.items.filter(i => i.verified).length;
+                        const diff     = s.items.filter(i => i.verified && i.variance !== 0).length;
+                        html += `<div style="border: 2px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 10px; background: #f8fafc;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                <div style="font-weight:700; font-size:15px; color:#1e293b;">${s.name}</div>
+                                <div style="font-size:12px; color:#64748b;">${new Date(s.createdAt).toLocaleDateString()}</div>
+                            </div>
+                            <div style="font-size:13px; color:#64748b; margin-bottom:10px;">
+                                ${verified}/${total} verified &nbsp;|&nbsp; <span style="color:#ef4444;">${diff} discrepancies</span>
+                            </div>
+                            <button onclick="qbResumeSession('${s.id}')" style="width:100%; padding:10px; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; background:#f59e0b; color:white;">▶ Resume Session</button>
+                        </div>`;
+                    });
+                    list.innerHTML = html;
+                } else {
+                    area.style.display = 'none';
+                }
+            } catch(e) {
+                console.error('qbInitTab error:', e);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function qbResumeSession(sessionId) {
+            showLoading(true, 'Loading session...');
+            try {
+                const sessions = await qbLoadSessionsFromCloud();
+                const session  = sessions.find(s => s.id === sessionId);
+                if (!session) { showNotification('Session not found', 'error'); return; }
+                qbCurrentSession = session;
+                qbShowSessionScreen();
+            } catch(e) {
+                showNotification('Error loading session: ' + e.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // ---- File upload handler ----
+        function qbHandleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('qbCSVPaste').value = e.target.result;
+                document.getElementById('qbFileStatus').style.display = 'block';
+                document.getElementById('qbFileStatus').textContent = '✓ File loaded: ' + file.name;
+            };
+            reader.readAsText(file);
+        }
+
+        // ---- Parse QB CSV ----
+        function qbParseCSV(text) {
+            const lines = text.trim().split('\n');
+            const items = [];
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                // Skip header row
+                if (i === 0 && (line.toLowerCase().includes('sku') || line.toLowerCase().includes('item'))) continue;
+                const parts = line.split(',').map(p => p.trim().replace(/^["']|["']$/g, ''));
+                if (parts.length < 2) continue;
+                const sku    = parts[0].toUpperCase();
+                const desc   = parts[1] || '';
+                const qbQty  = parts[2] !== undefined ? (parseInt(parts[2]) || 0) : 0;
+                if (!sku) continue;
+                // Find InvenTrack qty
+                const invItem = inventory.find(i => i.sku === sku);
+                items.push({
+                    sku:        sku,
+                    description: desc || (invItem ? invItem.description : ''),
+                    qbQty:      qbQty,
+                    itQty:      invItem ? (invItem.qtyOnHand || 0) : null,  // null = not in InvenTrack
+                    location:   invItem ? (invItem.location || '') : '',
+                    verified:   false,
+                    actualQty:  null,
+                    variance:   null,
+                    notes:      '',
+                    verifiedAt: null,
+                    verifiedBy: null
+                });
+            }
+            return items;
+        }
+
+        // ---- Start new session ----
+        async function qbStartSession() {
+            const csvText = document.getElementById('qbCSVPaste').value.trim();
+            if (!csvText) {
+                showNotification('Please upload or paste a CSV first', 'error');
+                return;
+            }
+            const sessionName = document.getElementById('qbSessionName').value.trim() || ('QB Reconcile ' + new Date().toLocaleDateString());
+            const items = qbParseCSV(csvText);
+            if (items.length === 0) {
+                showNotification('No valid items found in CSV', 'error');
+                return;
+            }
+
+            qbCurrentSession = {
+                id:        'qb_' + Date.now(),
+                name:      sessionName,
+                createdAt: new Date().toISOString(),
+                status:    'active',
+                items:     items
+            };
+
+            showLoading(true, 'Saving session to cloud...');
+            try {
+                await qbSaveSessionToCloud(qbCurrentSession);
+                qbShowSessionScreen();
+                showNotification('Session started! ' + items.length + ' items loaded.');
+            } catch(e) {
+                showNotification('Error saving session: ' + e.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function qbShowSessionScreen() {
+            document.getElementById('qbUploadScreen').style.display   = 'none';
+            document.getElementById('qbSessionScreen').style.display  = 'block';
+            document.getElementById('qbResultsScreen').style.display  = 'none';
+            document.getElementById('qbActiveSessionName').textContent = qbCurrentSession.name;
+            qbCurrentFilter = 'all';
+            qbUpdateFilterButtons();
+            qbUpdateProgress();
+            qbRenderList();
+        }
+
+        // ---- Filter buttons ----
+        function qbSetFilter(f) {
+            qbCurrentFilter = f;
+            qbUpdateFilterButtons();
+            qbRenderList();
+        }
+
+        function qbUpdateFilterButtons() {
+            ['all','pending','ok','diff'].forEach(f => {
+                const btn = document.getElementById('qbFilter' + f.charAt(0).toUpperCase() + f.slice(1));
+                if (!btn) return;
+                const active = f === qbCurrentFilter;
+                btn.style.background    = active ? '#3b82f6' : 'white';
+                btn.style.color         = active ? 'white' : '#64748b';
+                btn.style.borderColor   = active ? '#3b82f6' : '#e2e8f0';
+            });
+        }
+
+        // ---- Progress ----
+        function qbUpdateProgress() {
+            if (!qbCurrentSession) return;
+            const items      = qbCurrentSession.items;
+            const total      = items.length;
+            const verified   = items.filter(i => i.verified).length;
+            const discrepant = items.filter(i => i.verified && i.variance !== 0).length;
+            const pct        = total > 0 ? (verified / total) * 100 : 0;
+
+            document.getElementById('qbVerifiedCount').textContent    = verified;
+            document.getElementById('qbTotalCount').textContent       = total;
+            document.getElementById('qbDiscrepancyCount').textContent = discrepant;
+            document.getElementById('qbProgressBar').style.width      = pct + '%';
+        }
+
+        // ---- Render item list ----
+        function qbRenderList() {
+            if (!qbCurrentSession) return;
+            const search = (document.getElementById('qbSearchBox').value || '').toLowerCase();
+            let items    = qbCurrentSession.items;
+
+            // Apply filter
+            if (qbCurrentFilter === 'pending') items = items.filter(i => !i.verified);
+            if (qbCurrentFilter === 'ok')      items = items.filter(i => i.verified && i.variance === 0);
+            if (qbCurrentFilter === 'diff')    items = items.filter(i => i.verified && i.variance !== 0);
+
+            // Apply search
+            if (search) {
+                items = items.filter(i =>
+                    i.sku.toLowerCase().includes(search) ||
+                    (i.description && i.description.toLowerCase().includes(search))
+                );
+            }
+
+            const container = document.getElementById('qbItemList');
+            if (items.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:40px; color:#94a3b8; background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">No items match the current filter</div>';
+                return;
+            }
+
+            let html = '';
+            items.forEach(item => {
+                // Determine status color/label
+                let statusBg, statusColor, statusLabel;
+                if (!item.verified) {
+                    statusBg = '#f1f5f9'; statusColor = '#64748b'; statusLabel = 'Pending';
+                } else if (item.variance === 0) {
+                    statusBg = '#d1fae5'; statusColor = '#065f46'; statusLabel = '✓ Match';
+                } else {
+                    statusBg = '#fee2e2'; statusColor = '#991b1b'; statusLabel = '⚠️ Diff';
+                }
+
+                const itDisplay  = item.itQty !== null ? item.itQty : '—';
+                const varDisplay = item.verified ? ((item.variance > 0 ? '+' : '') + item.variance) : '—';
+
+                html += `<div onclick="qbOpenVerify('${item.sku}')" style="background:white; padding:14px 16px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.06); margin-bottom:10px; cursor:pointer; border-left: 4px solid ${item.verified ? (item.variance === 0 ? '#10b981' : '#ef4444') : '#e2e8f0'};">
+                    <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:6px;">
+                        <div>
+                            <div style="font-size:16px; font-weight:700; color:#1e293b;">${item.sku}</div>
+                            <div style="font-size:13px; color:#64748b;">${item.description || '—'}</div>
+                            ${item.location ? `<div style="font-size:12px; color:#94a3b8; margin-top:2px;">📍 ${item.location}</div>` : ''}
+                        </div>
+                        <span style="padding:4px 10px; border-radius:20px; font-size:12px; font-weight:700; background:${statusBg}; color:${statusColor}; white-space:nowrap; margin-left:8px;">${statusLabel}</span>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:8px;">
+                        <div style="background:#fef9c3; padding:8px; border-radius:6px; text-align:center;">
+                            <div style="font-size:10px; font-weight:700; color:#713f12; margin-bottom:2px;">QB QTY</div>
+                            <div style="font-size:18px; font-weight:800; color:#713f12;">${item.qbQty}</div>
+                        </div>
+                        <div style="background:#dbeafe; padding:8px; border-radius:6px; text-align:center;">
+                            <div style="font-size:10px; font-weight:700; color:#1e40af; margin-bottom:2px;">INVEN QTY</div>
+                            <div style="font-size:18px; font-weight:800; color:#1e40af;">${itDisplay}</div>
+                        </div>
+                        <div style="background:${item.verified ? (item.variance === 0 ? '#d1fae5' : '#fee2e2') : '#f1f5f9'}; padding:8px; border-radius:6px; text-align:center;">
+                            <div style="font-size:10px; font-weight:700; color:${item.verified ? (item.variance === 0 ? '#065f46' : '#991b1b') : '#64748b'}; margin-bottom:2px;">VARIANCE</div>
+                            <div style="font-size:18px; font-weight:800; color:${item.verified ? (item.variance === 0 ? '#065f46' : '#991b1b') : '#64748b'};">${varDisplay}</div>
+                        </div>
+                    </div>
+                    ${item.notes ? `<div style="margin-top:8px; font-size:12px; color:#64748b; font-style:italic;">📝 ${item.notes}</div>` : ''}
+                </div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // ---- Open verify card ----
+        function qbOpenVerify(sku) {
+            qbVerifyingSKU  = sku;
+            const item      = qbCurrentSession.items.find(i => i.sku === sku);
+            if (!item) return;
+
+            document.getElementById('qbVerifySKU').textContent  = item.sku;
+            document.getElementById('qbVerifyDesc').textContent = item.description || '—';
+            document.getElementById('qbVerifyQBQty').textContent = item.qbQty;
+            document.getElementById('qbVerifyITQty').textContent = item.itQty !== null ? item.itQty : '—';
+            document.getElementById('qbVerifyNotes').value       = item.notes || '';
+            document.getElementById('qbVerifyLocationBadge').textContent = item.location ? '📍 ' + item.location : '';
+
+            // Prefill actual count: if previously verified use that, otherwise use InvenTrack qty
+            const defaultCount = item.verified ? item.actualQty : (item.itQty !== null ? item.itQty : 0);
+            document.getElementById('qbActualCount').value = defaultCount !== null ? defaultCount : 0;
+
+            // Show blank variance for now (update on input)
+            qbUpdateVerifyVariance();
+
+            const card = document.getElementById('qbVerifyCard');
+            card.style.display = 'flex';
+
+            // Update variance live
+            document.getElementById('qbActualCount').oninput = qbUpdateVerifyVariance;
+        }
+
+        function qbUpdateVerifyVariance() {
+            const item      = qbCurrentSession ? qbCurrentSession.items.find(i => i.sku === qbVerifyingSKU) : null;
+            const actualQty = parseInt(document.getElementById('qbActualCount').value) || 0;
+            const qbQty     = item ? item.qbQty : 0;
+            const variance  = actualQty - qbQty;
+
+            const box   = document.getElementById('qbVerifyVarianceBox');
+            const label = document.getElementById('qbVerifyVarianceLabel');
+            const val   = document.getElementById('qbVerifyVarianceVal');
+
+            val.textContent  = (variance > 0 ? '+' : '') + variance;
+            label.textContent = 'Variance';
+
+            if (variance === 0) {
+                box.style.background = '#d1fae5'; box.style.color = '#065f46';
+                val.style.color = '#065f46'; label.style.color = '#065f46';
+            } else {
+                box.style.background = '#fee2e2'; box.style.color = '#991b1b';
+                val.style.color = '#991b1b'; label.style.color = '#991b1b';
+            }
+        }
+
+        function qbAdjustCount(delta) {
+            const input = document.getElementById('qbActualCount');
+            const val   = parseInt(input.value) || 0;
+            input.value = Math.max(0, val + delta);
+            qbUpdateVerifyVariance();
+        }
+
+        function qbCancelVerify() {
+            document.getElementById('qbVerifyCard').style.display = 'none';
+            qbVerifyingSKU = null;
+        }
+
+        async function qbSaveVerify() {
+            const sku       = qbVerifyingSKU;
+            const actualQty = parseInt(document.getElementById('qbActualCount').value) || 0;
+            const notes     = document.getElementById('qbVerifyNotes').value.trim();
+
+            const item  = qbCurrentSession.items.find(i => i.sku === sku);
+            if (!item) return;
+
+            item.verified   = true;
+            item.actualQty  = actualQty;
+            item.variance   = actualQty - item.qbQty;
+            item.notes      = notes;
+            item.verifiedAt = new Date().toISOString();
+
+            document.getElementById('qbVerifyCard').style.display = 'none';
+            qbVerifyingSKU = null;
+
+            // Save to cloud
+            try {
+                await qbSaveSessionToCloud(qbCurrentSession);
+            } catch(e) {
+                console.error('Cloud save after verify error:', e);
+            }
+
+            qbUpdateProgress();
+            qbRenderList();
+            showNotification('✓ Verified: ' + sku + (item.variance !== 0 ? ' ⚠️ Variance: ' + (item.variance > 0 ? '+' : '') + item.variance : ' ✓ Match'));
+        }
+
+        // ---- Finish session ----
+        async function qbFinishSession() {
+            if (!qbCurrentSession) return;
+            const total    = qbCurrentSession.items.length;
+            const verified = qbCurrentSession.items.filter(i => i.verified).length;
+
+            if (verified === 0) {
+                showNotification('No items verified yet', 'error');
+                return;
+            }
+
+            if (verified < total) {
+                if (!confirm(verified + ' of ' + total + ' items verified. Finish anyway?\n\nUnverified items will be listed as pending in the report.')) return;
+            }
+
+            showLoading(true, 'Finalizing session...');
+            try {
+                qbCurrentSession.status     = 'finished';
+                qbCurrentSession.finishedAt = new Date().toISOString();
+                await qbMarkSessionFinished(qbCurrentSession.id);
+                qbShowResults();
+            } catch(e) {
+                showNotification('Error: ' + e.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // ---- Results screen ----
+        function qbShowResults() {
+            document.getElementById('qbSessionScreen').style.display  = 'none';
+            document.getElementById('qbResultsScreen').style.display  = 'block';
+
+            const session    = qbCurrentSession;
+            const total      = session.items.length;
+            const verified   = session.items.filter(i => i.verified).length;
+            const matches    = session.items.filter(i => i.verified && i.variance === 0).length;
+            const diffs      = session.items.filter(i => i.verified && i.variance !== 0).length;
+            const pending    = total - verified;
+
+            document.getElementById('qbResultsTitle').textContent = session.name;
+            document.getElementById('qbResultsDate').textContent  = 'Finished: ' + new Date().toLocaleString();
+
+            document.getElementById('qbResultsSummary').innerHTML =
+                qbStatBox(total,    '📦', 'Total',   '#f8fafc', '#1e293b') +
+                qbStatBox(matches,  '✓',  'Match',   '#d1fae5', '#065f46') +
+                qbStatBox(diffs,    '⚠️', 'Differ',  '#fee2e2', '#991b1b');
+
+            // Discrepancy detail
+            const diffItems = session.items.filter(i => i.verified && i.variance !== 0);
+            const pendItems = session.items.filter(i => !i.verified);
+
+            let html = '';
+            if (diffItems.length > 0) {
+                html += '<h3 style="font-size:15px; font-weight:700; margin-bottom:10px; color:#991b1b;">⚠️ Discrepancies (' + diffItems.length + ')</h3>';
+                diffItems.forEach(item => {
+                    html += `<div style="background:#fff5f5; border:1px solid #fecaca; border-radius:8px; padding:12px; margin-bottom:8px;">
+                        <div style="font-weight:700; color:#1e293b; margin-bottom:4px;">${item.sku}</div>
+                        <div style="font-size:13px; color:#64748b; margin-bottom:6px;">${item.description || ''}</div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; font-size:13px;">
+                            <div><strong>QB:</strong> ${item.qbQty}</div>
+                            <div><strong>Physical:</strong> ${item.actualQty}</div>
+                            <div style="color:#991b1b;"><strong>Variance:</strong> ${item.variance > 0 ? '+' : ''}${item.variance}</div>
+                        </div>
+                        ${item.notes ? `<div style="font-size:12px; color:#64748b; margin-top:6px; font-style:italic;">📝 ${item.notes}</div>` : ''}
+                    </div>`;
+                });
+            }
+
+            if (pendItems.length > 0) {
+                html += '<h3 style="font-size:15px; font-weight:700; margin-bottom:10px; margin-top:16px; color:#64748b;">⏳ Not Verified (' + pendItems.length + ')</h3>';
+                pendItems.forEach(item => {
+                    html += `<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px; margin-bottom:8px;">
+                        <div style="font-weight:700; color:#64748b;">${item.sku}</div>
+                        <div style="font-size:13px; color:#94a3b8;">${item.description || ''} &nbsp;|&nbsp; QB Qty: ${item.qbQty}</div>
+                    </div>`;
+                });
+            }
+
+            document.getElementById('qbResultsDetail').innerHTML = html;
+        }
+
+        function qbStatBox(value, icon, label, bg, color) {
+            return `<div style="background:${bg}; padding:14px; border-radius:10px; text-align:center;">
+                <div style="font-size:22px; margin-bottom:4px;">${icon}</div>
+                <div style="font-size:24px; font-weight:800; color:${color};">${value}</div>
+                <div style="font-size:12px; color:${color}; font-weight:600; margin-top:2px;">${label}</div>
+            </div>`;
+        }
+
+        // ---- Export CSV ----
+        function qbExportResults() {
+            if (!qbCurrentSession) return;
+            const session = qbCurrentSession;
+            let csv = 'QB Reconcile Report\n';
+            csv += 'Session: ' + session.name + '\n';
+            csv += 'Date: ' + new Date().toLocaleString() + '\n\n';
+            csv += 'SKU,Description,Location,QB_Qty,InvenTrack_Qty,Physical_Count,Variance,Status,Notes,Verified_At\n';
+
+            session.items.forEach(item => {
+                const status = !item.verified ? 'PENDING' : (item.variance === 0 ? 'MATCH' : 'DISCREPANCY');
+                csv += `"${item.sku}","${item.description || ''}","${item.location || ''}",`;
+                csv += `${item.qbQty},${item.itQty !== null ? item.itQty : ''},`;
+                csv += `${item.verified ? item.actualQty : ''},`;
+                csv += `${item.verified ? item.variance : ''},`;
+                csv += `"${status}","${item.notes || ''}","${item.verifiedAt ? new Date(item.verifiedAt).toLocaleString() : ''}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url  = URL.createObjectURL(blob);
+            const a    = document.createElement('a');
+            a.href     = url;
+            a.download = 'QB_Reconcile_' + session.name.replace(/\s+/g, '_') + '_' + new Date().toISOString().slice(0,10) + '.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+            showNotification('Report exported!');
+        }
+
+        function qbNewSession() {
+            qbCurrentSession = null;
+            document.getElementById('qbResultsScreen').style.display  = 'none';
+            document.getElementById('qbSessionScreen').style.display  = 'none';
+            document.getElementById('qbUploadScreen').style.display   = 'block';
+            document.getElementById('qbCSVPaste').value               = '';
+            document.getElementById('qbSessionName').value            = '';
+            document.getElementById('qbFileStatus').style.display     = 'none';
+            document.getElementById('qbCSVFile').value                = '';
+            qbInitTab();
+        }
+
+        // ---- Hook into tab switching ----
+        // Extend existing tab switch handler
+        const _origTabSwitch = document.querySelectorAll('.menu-item');
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const tab = this.getAttribute('data-tab');
+                if (tab === 'qb-reconcile') {
+                    // Show upload screen by default, init sessions list
+                    document.getElementById('qbUploadScreen').style.display  = 'block';
+                    document.getElementById('qbSessionScreen').style.display = 'none';
+                    document.getElementById('qbResultsScreen').style.display = 'none';
+                    document.getElementById('qbVerifyCard').style.display    = 'none';
+                    qbInitTab();
+                }
+            });
+        });
+
+        // END QB RECONCILE
+        // ============================================================
+
     </script>
 </body>
 </html>
