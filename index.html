@@ -837,9 +837,10 @@
                         </div>
 
                         <div style="background: #fef9c3; border: 2px solid #fde047; padding: 14px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; color: #713f12;">
-                            <strong>📄 CSV Format:</strong> Your QuickBooks export should have these columns:<br>
-                            <code style="display: block; margin-top: 6px; background: #fff; padding: 6px 10px; border-radius: 4px; font-size: 12px;">SKU, Description, QB_Qty</code>
-                            Example row: <code>GH4G-4MB, GH Fitting, 12</code>
+                            <strong>📄 CSV Format:</strong> Just two columns — SKU and Quantity:<br>
+                            <code style="display: block; margin-top: 6px; background: #fff; padding: 6px 10px; border-radius: 4px; font-size: 12px;">SKU, Qty</code>
+                            Example: <code>GH4G-4MB, 12</code><br>
+                            <span style="font-size: 12px; opacity: 0.8;">Description will be pulled automatically from InvenTrack.</span>
                         </div>
 
                         <div style="margin-bottom: 16px;">
@@ -856,7 +857,7 @@
 
                         <div style="margin-bottom: 20px;">
                             <label style="display: block; margin-bottom: 6px; font-weight: 600;">— or Paste CSV Data —</label>
-                            <textarea id="qbCSVPaste" rows="6" placeholder="SKU,Description,QB_Qty&#10;GH4G-4MB,GH Fitting,12&#10;P165789,Filter Element,50" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; font-family: monospace; box-sizing: border-box;"></textarea>
+                            <textarea id="qbCSVPaste" rows="6" placeholder="SKU,Qty&#10;GH4G-4MB,12&#10;P165789,50&#10;MW2018-7615-BSK,8" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; font-family: monospace; box-sizing: border-box;"></textarea>
                         </div>
 
                         <button onclick="qbStartSession()" style="width: 100%; padding: 16px; border: none; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; background: #f59e0b; color: white;">🚀 Upload & Start Session</button>
@@ -3259,24 +3260,34 @@
                 if (i === 0 && (line.toLowerCase().includes('sku') || line.toLowerCase().includes('item'))) continue;
                 const parts = line.split(',').map(p => p.trim().replace(/^["']|["']$/g, ''));
                 if (parts.length < 2) continue;
-                const sku    = parts[0].toUpperCase();
-                const desc   = parts[1] || '';
-                const qbQty  = parts[2] !== undefined ? (parseInt(parts[2]) || 0) : 0;
+
+                // Support both "SKU,Qty" and "SKU,Description,Qty"
+                let sku, qbQty;
+                if (parts.length === 2) {
+                    // Simple 2-column format: SKU, Qty
+                    sku   = parts[0].toUpperCase();
+                    qbQty = parseInt(parts[1]) || 0;
+                } else {
+                    // 3+ column format: SKU, Description, Qty
+                    sku   = parts[0].toUpperCase();
+                    qbQty = parseInt(parts[2]) || 0;
+                }
+
                 if (!sku) continue;
-                // Find InvenTrack qty
+
+                // Pull description and location from InvenTrack
                 const invItem = inventory.find(i => i.sku === sku);
                 items.push({
-                    sku:        sku,
-                    description: desc || (invItem ? invItem.description : ''),
-                    qbQty:      qbQty,
-                    itQty:      invItem ? (invItem.qtyOnHand || 0) : null,  // null = not in InvenTrack
-                    location:   invItem ? (invItem.location || '') : '',
-                    verified:   false,
-                    actualQty:  null,
-                    variance:   null,
-                    notes:      '',
-                    verifiedAt: null,
-                    verifiedBy: null
+                    sku:         sku,
+                    description: invItem ? (invItem.description || '') : '',
+                    qbQty:       qbQty,
+                    itQty:       invItem ? (invItem.qtyOnHand || 0) : null,
+                    location:    invItem ? (invItem.location || '') : '',
+                    verified:    false,
+                    actualQty:   null,
+                    variance:    null,
+                    notes:       '',
+                    verifiedAt:  null
                 });
             }
             return items;
