@@ -1223,26 +1223,47 @@
             });
         }
 
+        function switchToTab(tab) {
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            const menuItem = document.querySelector('.menu-item[data-tab="' + tab + '"]');
+            if (menuItem) menuItem.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+            const tabEl = document.getElementById(tab + '-tab');
+            if (tabEl) tabEl.style.display = 'block';
+            document.getElementById('menuOverlay').style.display = 'none';
+            document.getElementById('menuPanel').style.transform = 'translateX(-100%)';
+            // Save last active tab
+            localStorage.setItem('lastActiveTab', tab);
+            // Tab-specific init
+            if (tab === 'dashboard') updateDashboard();
+            if (tab === 'inventory') displayInventory();
+            if (tab === 'count-reports') displayCountReports();
+            if (tab === 'stock-entry') {
+                const selector = document.getElementById('skuFormatSelector');
+                if (selector && lastUsedFormat) {
+                    selector.value = lastUsedFormat;
+                    switchSKUFormat(lastUsedFormat);
+                }
+            }
+            if (tab === 'qb-reconcile') {
+                document.getElementById('qbUploadScreen').style.display  = 'block';
+                document.getElementById('qbSessionScreen').style.display = 'none';
+                document.getElementById('qbResultsScreen').style.display = 'none';
+                document.getElementById('qbVerifyCard').style.display    = 'none';
+                qbInitTab();
+            }
+            if (tab === 'tasks') {
+                document.getElementById('tasksListScreen').style.display   = 'block';
+                document.getElementById('tasksFormScreen').style.display   = 'none';
+                document.getElementById('tasksDetailScreen').style.display = 'none';
+                tasksInit();
+            }
+        }
+
         document.querySelectorAll('.menu-item').forEach(item => {
             item.addEventListener('click', function() {
                 const tab = this.getAttribute('data-tab');
-                document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
-                this.classList.add('active');
-                document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
-                document.getElementById(tab + '-tab').style.display = 'block';
-                document.getElementById('menuOverlay').style.display = 'none';
-                document.getElementById('menuPanel').style.transform = 'translateX(-100%)';
-                if (tab === 'dashboard') updateDashboard();
-                if (tab === 'inventory') displayInventory();
-                if (tab === 'count-reports') displayCountReports();
-                if (tab === 'stock-entry') {
-                    // Restore last used format when entering Stock Entry
-                    const selector = document.getElementById('skuFormatSelector');
-                    if (selector && lastUsedFormat) {
-                        selector.value = lastUsedFormat;
-                        switchSKUFormat(lastUsedFormat);
-                    }
-                }
+                if (tab) switchToTab(tab);
             });
         });
 
@@ -3801,23 +3822,6 @@
             qbInitTab();
         }
 
-        // ---- Hook into tab switching ----
-        // Extend existing tab switch handler
-        const _origTabSwitch = document.querySelectorAll('.menu-item');
-        document.querySelectorAll('.menu-item').forEach(item => {
-            item.addEventListener('click', function() {
-                const tab = this.getAttribute('data-tab');
-                if (tab === 'qb-reconcile') {
-                    // Show upload screen by default, init sessions list
-                    document.getElementById('qbUploadScreen').style.display  = 'block';
-                    document.getElementById('qbSessionScreen').style.display = 'none';
-                    document.getElementById('qbResultsScreen').style.display = 'none';
-                    document.getElementById('qbVerifyCard').style.display    = 'none';
-                    qbInitTab();
-                }
-            });
-        });
-
         // END QB RECONCILE
         // ============================================================
 
@@ -3878,6 +3882,10 @@
 
             // Load inventory
             await loadInventory();
+
+            // Restore last active tab
+            const lastTab = localStorage.getItem('lastActiveTab') || 'dashboard';
+            switchToTab(lastTab);
         }
 
         function showLoginScreen() {
@@ -4251,19 +4259,6 @@
                 showLoading(false);
             }
         }
-
-        // Hook tasks init into tab switching
-        document.querySelectorAll('.menu-item').forEach(item => {
-            item.addEventListener('click', function() {
-                const tab = this.getAttribute('data-tab');
-                if (tab === 'tasks') {
-                    document.getElementById('tasksListScreen').style.display   = 'block';
-                    document.getElementById('tasksFormScreen').style.display   = 'none';
-                    document.getElementById('tasksDetailScreen').style.display = 'none';
-                    tasksInit();
-                }
-            });
-        });
 
         // END TASKS
         // ============================================================
