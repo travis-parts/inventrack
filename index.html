@@ -10,7 +10,7 @@
 <body>
 
     <!-- LOGIN SCREEN -->
-    <div id="loginScreen" style="min-height:100vh; background: linear-gradient(135deg, #1e293b 0%, #334155 100%); display:flex; align-items:center; justify-content:center; padding:24px;">
+    <div id="loginScreen" style="display:none; min-height:100vh; background: linear-gradient(135deg, #1e293b 0%, #334155 100%); align-items:center; justify-content:center; padding:24px;">
         <div style="background:white; border-radius:20px; padding:32px 28px; width:100%; max-width:400px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
             <div style="text-align:center; margin-bottom:28px;">
                 <div style="font-size:48px; margin-bottom:8px;">&#x1F4E6;</div>
@@ -3872,9 +3872,14 @@
         }
 
         function showLoginScreen() {
-            document.getElementById('loginScreen').style.display = 'flex';
+            const ls = document.getElementById('loginScreen');
+            ls.style.display    = 'flex';
+            ls.style.alignItems = 'center';
+            ls.style.justifyContent = 'center';
             document.getElementById('app').style.display = 'none';
-            currentUser = null;
+            currentUser     = null;
+            currentUserRole = 'employee';
+            currentUserName = 'User';
         }
 
         async function doLogin() {
@@ -3910,6 +3915,13 @@
             // Close menu
             document.getElementById('menuOverlay').style.display = 'none';
             document.getElementById('menuPanel').style.transform = 'translateX(-100%)';
+            // Clear fields and go to login
+            document.getElementById('loginEmail').value    = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginError').style.display = 'none';
+            document.getElementById('loginBtn').textContent = 'Sign In';
+            document.getElementById('loginBtn').disabled   = false;
+            showLoginScreen();
         }
 
         async function doPasswordReset() {
