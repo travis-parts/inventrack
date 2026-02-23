@@ -3876,6 +3876,18 @@
             if (nameEl) nameEl.textContent = currentUserName;
             if (roleEl) roleEl.textContent = currentUserRole === 'manager' ? '⭐ Manager' : '👷 Employee';
 
+            // Role-based menu visibility
+            const employeeTabs = ['dashboard', 'tasks', 'inventory', 'stock-entry', 'add-edit', 'qb-reconcile'];
+            document.querySelectorAll('.menu-item').forEach(item => {
+                const tab = item.getAttribute('data-tab');
+                if (!tab) return; // skip section headers
+                if (currentUserRole === 'manager') {
+                    item.style.display = '';
+                } else {
+                    item.style.display = employeeTabs.includes(tab) ? '' : 'none';
+                }
+            });
+
             // Show app, hide login
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('app').style.display = 'block';
@@ -3883,9 +3895,11 @@
             // Load inventory
             await loadInventory();
 
-            // Restore last active tab
+            // Restore last active tab (fall back to dashboard if employee can't access it)
+            const employeeTabs = ['dashboard', 'tasks', 'inventory', 'stock-entry', 'add-edit', 'qb-reconcile'];
             const lastTab = localStorage.getItem('lastActiveTab') || 'dashboard';
-            switchToTab(lastTab);
+            const canAccess = currentUserRole === 'manager' || employeeTabs.includes(lastTab);
+            switchToTab(canAccess ? lastTab : 'dashboard');
         }
 
         function showLoginScreen() {
