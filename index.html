@@ -7,10 +7,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
 </head>
-<body>
+<body style="margin:0; background:#1e293b;">
 
     <!-- LOGIN SCREEN -->
-    <div id="loginScreen" style="display:none; min-height:100vh; background: linear-gradient(135deg, #1e293b 0%, #334155 100%); align-items:center; justify-content:center; padding:24px;">
+    <div id="loginScreen" style="display:flex; min-height:100vh; background: linear-gradient(135deg, #1e293b 0%, #334155 100%); align-items:center; justify-content:center; padding:24px;">
         <div style="background:white; border-radius:20px; padding:32px 28px; width:100%; max-width:400px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
             <div style="text-align:center; margin-bottom:28px;">
                 <div style="font-size:48px; margin-bottom:8px;">&#x1F4E6;</div>
@@ -2131,7 +2131,8 @@
         // Old event listener cleanup
         document.getElementById('manualSKUInput') && document.getElementById('manualSKUInput').addEventListener('input', function(e) {
             const value = e.target.value.toUpperCase();
-            const dropdown = document.getElementById('manualSKUDropdown');
+            const dropdown = document.getElementById('manualSKUDropdown') || document.getElementById('skuDropdown');
+            if (!dropdown) return;
             
             if (value.length < 2) {
                 dropdown.style.display = 'none';
@@ -3293,6 +3294,7 @@
             const maxVal   = document.getElementById(maxId).value !== '' ? parseInt(document.getElementById(maxId).value) : null;
             const location = document.getElementById(locationId).value.trim().toUpperCase();
             try {
+                showLoading(true, 'Saving...');
                 const { error } = await db.from('inventory').upsert({
                     sku, qty_on_hand: qoh, stock_min: minVal, stock_max: maxVal,
                     location, updated_at: new Date().toISOString()
@@ -3307,9 +3309,12 @@
                     lastSaved.textContent = '✓ Saved: ' + sku + '  (QOH: ' + qoh + ')';
                     lastSaved.style.display = 'block';
                 }
+                showNotification('✓ Saved: ' + sku);
                 clearFn();
             } catch(e) {
                 showNotification('Error: ' + e.message, 'error');
+            } finally {
+                showLoading(false);
             }
         }
 
