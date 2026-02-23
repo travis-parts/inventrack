@@ -656,9 +656,11 @@
                     <label style="display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">SKU Format</label>
                     <select id="skuFormatSelector" onchange="switchSKUFormat(this.value)" style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 16px; font-weight: 600; background: white;">
                         <option value="manual">Manual Entry (any format)</option>
-                        <option value="GH">GH - Gates Crimp Fittings</option>
-                        <option value="MW" disabled>MW - (Coming Soon)</option>
-                        <option value="MC" disabled>MC - (Coming Soon)</option>
+                        <option value="GH">GH — Gates Crimp Fittings</option>
+                        <option value="GHA">GHA — Gates Adapter Fittings</option>
+                        <option value="MH">MH — McHale</option>
+                        <option value="MW">MW — Martin Welding</option>
+                        <option value="FDP">FDP — Donaldson</option>
                     </select>
                 </div>
 
@@ -848,6 +850,222 @@
                     </button>
                 </div>
             </div>
+
+
+                <!-- GHA — Gates Adapter Fittings -->
+                <div id="ghaEntryForm" style="display:none; background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08); padding:20px;">
+                    <div style="background:#fef9c3; border:2px solid #fde047; padding:10px 14px; border-radius:8px; margin-bottom:16px; font-size:13px; color:#713f12; font-weight:600;">
+                        Format: GHA-{series}-{2 digits}-{2 digits}
+                    </div>
+                    <div id="ghaSkuWarning" style="display:none; color:#ef4444; font-size:13px; margin-bottom:12px; font-weight:600;">⚠️ SKU already exists — saving will update it</div>
+
+                    <!-- Series selector -->
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block; font-size:13px; font-weight:700; color:#64748b; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Series (4 digits) *</label>
+                        <div style="display:flex; gap:8px;">
+                            <select id="ghaSeriesSelect" onchange="ghaOnSeriesSelect()" style="flex:1; padding:14px; border:2px solid #e2e8f0; border-radius:10px; font-size:16px; font-weight:600; background:white;">
+                                <option value="">— Select or type new —</option>
+                            </select>
+                            <input type="text" id="ghaSeriesNew" placeholder="New" inputmode="numeric" maxlength="4"
+                                   oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4); ghaUpdatePreview();"
+                                   style="width:90px; padding:14px; border:2px solid #e2e8f0; border-radius:10px; font-size:16px; font-weight:700; text-align:center; box-sizing:border-box;">
+                        </div>
+                    </div>
+
+                    <!-- Two 2-digit fields -->
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+                        <div>
+                            <label style="display:block; font-size:13px; font-weight:700; color:#64748b; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">2 Digits *</label>
+                            <input type="text" id="ghaNum1" placeholder="06" inputmode="numeric" maxlength="2"
+                                   oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,2); ghaUpdatePreview(); ghaCheckExists();"
+                                   style="width:100%; padding:14px; border:2px solid #e2e8f0; border-radius:10px; font-size:20px; font-weight:700; text-align:center; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:13px; font-weight:700; color:#64748b; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">2 Digits *</label>
+                            <input type="text" id="ghaNum2" placeholder="02" inputmode="numeric" maxlength="2"
+                                   oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,2); ghaUpdatePreview(); ghaCheckExists();"
+                                   style="width:100%; padding:14px; border:2px solid #e2e8f0; border-radius:10px; font-size:20px; font-weight:700; text-align:center; box-sizing:border-box;">
+                        </div>
+                    </div>
+
+                    <!-- Preview -->
+                    <div style="background:#dbeafe; border:2px solid #3b82f6; padding:14px; border-radius:10px; margin-bottom:16px; text-align:center;">
+                        <div style="font-size:11px; font-weight:700; color:#1e40af; margin-bottom:6px; text-transform:uppercase; letter-spacing:1px;">Preview</div>
+                        <div id="ghaSKUPreview" style="font-size:24px; font-weight:700; color:#1e293b; font-family:monospace;">GHA-____-__-__</div>
+                    </div>
+
+                    <!-- QOH / Min / Max / Location -->
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block; font-size:13px; font-weight:700; color:#64748b; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Qty on Hand *</label>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <button onclick="adjustWizardQty('ghaQOH',-1)" style="width:48px;height:48px;border:none;border-radius:10px;font-size:24px;font-weight:700;cursor:pointer;background:#ef4444;color:white;flex-shrink:0;touch-action:manipulation;">−</button>
+                            <input type="number" id="ghaQOH" value="0" min="0" inputmode="numeric" style="flex:1;padding:12px;border:2px solid #e2e8f0;border-radius:10px;font-size:20px;font-weight:700;text-align:center;min-width:0;">
+                            <button onclick="adjustWizardQty('ghaQOH',1)" style="width:48px;height:48px;border:none;border-radius:10px;font-size:24px;font-weight:700;cursor:pointer;background:#10b981;color:white;flex-shrink:0;touch-action:manipulation;">+</button>
+                        </div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+                        <div>
+                            <label style="display:block;font-size:13px;font-weight:700;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">Min</label>
+                            <input type="number" id="ghaMIN" placeholder="0" min="0" inputmode="numeric" style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;font-size:18px;font-weight:700;text-align:center;box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block;font-size:13px;font-weight:700;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">Max</label>
+                            <input type="number" id="ghaMAX" placeholder="0" min="0" inputmode="numeric" style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;font-size:18px;font-weight:700;text-align:center;box-sizing:border-box;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom:24px;">
+                        <label style="display:block;font-size:13px;font-weight:700;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">Location</label>
+                        <input type="text" id="ghaLocation" placeholder="e.g. A1-B2-C3" autocapitalize="characters" autocorrect="off" oninput="this.value=this.value.toUpperCase();" style="width:100%;box-sizing:border-box;padding:14px;border:2px solid #e2e8f0;border-radius:10px;font-size:16px;font-weight:600;text-transform:uppercase;">
+                    </div>
+                    <button onclick="saveGHAEntry()" style="width:100%;padding:20px;border:none;border-radius:12px;font-size:20px;font-weight:700;cursor:pointer;background:#10b981;color:white;touch-action:manipulation;">✓ Save &amp; New</button>
+                </div>
+
+                <!-- MH — McHale -->
+                <div id="mhEntryForm" style="display:none; background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08); padding:20px;">
+                    <div style="background:#fef9c3; border:2px solid #fde047; padding:10px 14px; border-radius:8px; margin-bottom:16px; font-size:13px; color:#713f12; font-weight:600;">
+                        Format: MH-{3 letters}{5 numbers} &nbsp;e.g. MH-CPL00043
+                    </div>
+                    <div id="mhSkuWarning" style="display:none; color:#ef4444; font-size:13px; margin-bottom:12px; font-weight:600;">⚠️ SKU already exists — saving will update it</div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+                        <div>
+                            <label style="display:block; font-size:13px; font-weight:700; color:#64748b; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">3 Letters *</label>
+                            <input type="text" id="mhLetters" placeholder="CPL" maxlength="3"
+                                   autocapitalize="characters" autocorrect="off"
+                                   oninput="this.value=this.value.replace(/[^a-zA-Z]/g,'').toUpperCase().slice(0,3); mhUpdatePreview(); mhCheckExists();"
+                                   style="width:100%; padding:14px; border:2px solid #e2e8f0; border-radius:10px; font-size:22px; font-weight:700; text-align:center; box-sizing:border-box; text-transform:uppercase; letter-spacing:3px;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:13px; font-weight:700; color:#64748b; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">5 Numbers *</label>
+                            <input type="text" id="mhNumbers" placeholder="00043" maxlength="5" inputmode="numeric"
+                                   oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,5); mhUpdatePreview(); mhCheckExists();"
+                                   style="width:100%; padding:14px; border:2px solid #e2e8f0; border-radius:10px; font-size:22px; font-weight:700; text-align:center; box-sizing:border-box; letter-spacing:2px;">
+                        </div>
+                    </div>
+
+                    <!-- Preview -->
+                    <div style="background:#dbeafe; border:2px solid #3b82f6; padding:14px; border-radius:10px; margin-bottom:16px; text-align:center;">
+                        <div style="font-size:11px; font-weight:700; color:#1e40af; margin-bottom:6px; text-transform:uppercase; letter-spacing:1px;">Preview</div>
+                        <div id="mhSKUPreview" style="font-size:24px; font-weight:700; color:#1e293b; font-family:monospace;">MH-___00000</div>
+                    </div>
+
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block; font-size:13px; font-weight:700; color:#64748b; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Qty on Hand *</label>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <button onclick="adjustWizardQty('mhQOH',-1)" style="width:48px;height:48px;border:none;border-radius:10px;font-size:24px;font-weight:700;cursor:pointer;background:#ef4444;color:white;flex-shrink:0;touch-action:manipulation;">−</button>
+                            <input type="number" id="mhQOH" value="0" min="0" inputmode="numeric" style="flex:1;padding:12px;border:2px solid #e2e8f0;border-radius:10px;font-size:20px;font-weight:700;text-align:center;min-width:0;">
+                            <button onclick="adjustWizardQty('mhQOH',1)" style="width:48px;height:48px;border:none;border-radius:10px;font-size:24px;font-weight:700;cursor:pointer;background:#10b981;color:white;flex-shrink:0;touch-action:manipulation;">+</button>
+                        </div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+                        <div>
+                            <label style="display:block;font-size:13px;font-weight:700;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">Min</label>
+                            <input type="number" id="mhMIN" placeholder="0" min="0" inputmode="numeric" style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;font-size:18px;font-weight:700;text-align:center;box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block;font-size:13px;font-weight:700;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">Max</label>
+                            <input type="number" id="mhMAX" placeholder="0" min="0" inputmode="numeric" style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;font-size:18px;font-weight:700;text-align:center;box-sizing:border-box;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom:24px;">
+                        <label style="display:block;font-size:13px;font-weight:700;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">Location</label>
+                        <input type="text" id="mhLocation" placeholder="e.g. A1-B2-C3" autocapitalize="characters" autocorrect="off" oninput="this.value=this.value.toUpperCase();" style="width:100%;box-sizing:border-box;padding:14px;border:2px solid #e2e8f0;border-radius:10px;font-size:16px;font-weight:600;text-transform:uppercase;">
+                    </div>
+                    <button onclick="saveMHEntry()" style="width:100%;padding:20px;border:none;border-radius:12px;font-size:20px;font-weight:700;cursor:pointer;background:#10b981;color:white;touch-action:manipulation;">✓ Save &amp; New</button>
+                </div>
+
+                <!-- MW — Martin Welding -->
+                <div id="mwEntryForm" style="display:none; background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08); padding:20px;">
+                    <div style="background:#fef9c3; border:2px solid #fde047; padding:10px 14px; border-radius:8px; margin-bottom:16px; font-size:13px; color:#713f12; font-weight:600;">
+                        Format: MW{4}-{4}-{3+} &nbsp;e.g. MW2018-7615-158BSK
+                    </div>
+                    <div id="mwSkuWarning" style="display:none; color:#ef4444; font-size:13px; margin-bottom:12px; font-weight:600;">⚠️ SKU already exists — saving will update it</div>
+
+                    <!-- Single auto-format input -->
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block; font-size:13px; font-weight:700; color:#64748b; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Type numbers (auto-formats) *</label>
+                        <input type="text" id="mwRawInput" placeholder="2018761515800BSK" inputmode="numeric"
+                               autocapitalize="characters" autocorrect="off"
+                               oninput="mwAutoFormat(this); mwCheckExists();"
+                               style="width:100%; padding:14px; border:2px solid #e2e8f0; border-radius:10px; font-size:18px; font-weight:700; box-sizing:border-box; text-transform:uppercase; letter-spacing:1px;">
+                        <div style="font-size:12px; color:#94a3b8; margin-top:6px;">Type digits — dashes insert automatically. Switch to QWERTY for letters at the end.</div>
+                    </div>
+
+                    <!-- Preview -->
+                    <div style="background:#dbeafe; border:2px solid #3b82f6; padding:14px; border-radius:10px; margin-bottom:16px; text-align:center;">
+                        <div style="font-size:11px; font-weight:700; color:#1e40af; margin-bottom:6px; text-transform:uppercase; letter-spacing:1px;">Preview</div>
+                        <div id="mwSKUPreview" style="font-size:22px; font-weight:700; color:#1e293b; font-family:monospace;">MW____-____-___</div>
+                    </div>
+
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block; font-size:13px; font-weight:700; color:#64748b; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Qty on Hand *</label>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <button onclick="adjustWizardQty('mwQOH',-1)" style="width:48px;height:48px;border:none;border-radius:10px;font-size:24px;font-weight:700;cursor:pointer;background:#ef4444;color:white;flex-shrink:0;touch-action:manipulation;">−</button>
+                            <input type="number" id="mwQOH" value="0" min="0" inputmode="numeric" style="flex:1;padding:12px;border:2px solid #e2e8f0;border-radius:10px;font-size:20px;font-weight:700;text-align:center;min-width:0;">
+                            <button onclick="adjustWizardQty('mwQOH',1)" style="width:48px;height:48px;border:none;border-radius:10px;font-size:24px;font-weight:700;cursor:pointer;background:#10b981;color:white;flex-shrink:0;touch-action:manipulation;">+</button>
+                        </div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+                        <div>
+                            <label style="display:block;font-size:13px;font-weight:700;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">Min</label>
+                            <input type="number" id="mwMIN" placeholder="0" min="0" inputmode="numeric" style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;font-size:18px;font-weight:700;text-align:center;box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block;font-size:13px;font-weight:700;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">Max</label>
+                            <input type="number" id="mwMAX" placeholder="0" min="0" inputmode="numeric" style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;font-size:18px;font-weight:700;text-align:center;box-sizing:border-box;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom:24px;">
+                        <label style="display:block;font-size:13px;font-weight:700;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">Location</label>
+                        <input type="text" id="mwLocation" placeholder="e.g. A1-B2-C3" autocapitalize="characters" autocorrect="off" oninput="this.value=this.value.toUpperCase();" style="width:100%;box-sizing:border-box;padding:14px;border:2px solid #e2e8f0;border-radius:10px;font-size:16px;font-weight:600;text-transform:uppercase;">
+                    </div>
+                    <button onclick="saveMWEntry()" style="width:100%;padding:20px;border:none;border-radius:12px;font-size:20px;font-weight:700;cursor:pointer;background:#10b981;color:white;touch-action:manipulation;">✓ Save &amp; New</button>
+                </div>
+
+                <!-- FDP — Donaldson -->
+                <div id="fdpEntryForm" style="display:none; background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08); padding:20px;">
+                    <div style="background:#fef9c3; border:2px solid #fde047; padding:10px 14px; border-radius:8px; margin-bottom:16px; font-size:13px; color:#713f12; font-weight:600;">
+                        Format: FDP{numbers} &nbsp;e.g. FDP550325
+                    </div>
+                    <div id="fdpSkuWarning" style="display:none; color:#ef4444; font-size:13px; margin-bottom:12px; font-weight:600;">⚠️ SKU already exists — saving will update it</div>
+
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block; font-size:13px; font-weight:700; color:#64748b; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Part Numbers *</label>
+                        <input type="text" id="fdpNumbers" placeholder="550325" inputmode="numeric"
+                               oninput="this.value=this.value.replace(/[^0-9]/g,''); fdpUpdatePreview(); fdpCheckExists();"
+                               style="width:100%; padding:16px; border:2px solid #e2e8f0; border-radius:10px; font-size:22px; font-weight:700; text-align:center; box-sizing:border-box; letter-spacing:2px;">
+                    </div>
+
+                    <!-- Preview -->
+                    <div style="background:#dbeafe; border:2px solid #3b82f6; padding:14px; border-radius:10px; margin-bottom:16px; text-align:center;">
+                        <div style="font-size:11px; font-weight:700; color:#1e40af; margin-bottom:6px; text-transform:uppercase; letter-spacing:1px;">Preview</div>
+                        <div id="fdpSKUPreview" style="font-size:24px; font-weight:700; color:#1e293b; font-family:monospace;">FDP______</div>
+                    </div>
+
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block; font-size:13px; font-weight:700; color:#64748b; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Qty on Hand *</label>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <button onclick="adjustWizardQty('fdpQOH',-1)" style="width:48px;height:48px;border:none;border-radius:10px;font-size:24px;font-weight:700;cursor:pointer;background:#ef4444;color:white;flex-shrink:0;touch-action:manipulation;">−</button>
+                            <input type="number" id="fdpQOH" value="0" min="0" inputmode="numeric" style="flex:1;padding:12px;border:2px solid #e2e8f0;border-radius:10px;font-size:20px;font-weight:700;text-align:center;min-width:0;">
+                            <button onclick="adjustWizardQty('fdpQOH',1)" style="width:48px;height:48px;border:none;border-radius:10px;font-size:24px;font-weight:700;cursor:pointer;background:#10b981;color:white;flex-shrink:0;touch-action:manipulation;">+</button>
+                        </div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+                        <div>
+                            <label style="display:block;font-size:13px;font-weight:700;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">Min</label>
+                            <input type="number" id="fdpMIN" placeholder="0" min="0" inputmode="numeric" style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;font-size:18px;font-weight:700;text-align:center;box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block;font-size:13px;font-weight:700;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">Max</label>
+                            <input type="number" id="fdpMAX" placeholder="0" min="0" inputmode="numeric" style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:10px;font-size:18px;font-weight:700;text-align:center;box-sizing:border-box;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom:24px;">
+                        <label style="display:block;font-size:13px;font-weight:700;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">Location</label>
+                        <input type="text" id="fdpLocation" placeholder="e.g. A1-B2-C3" autocapitalize="characters" autocorrect="off" oninput="this.value=this.value.toUpperCase();" style="width:100%;box-sizing:border-box;padding:14px;border:2px solid #e2e8f0;border-radius:10px;font-size:16px;font-weight:600;text-transform:uppercase;">
+                    </div>
+                    <button onclick="saveFDPEntry()" style="width:100%;padding:20px;border:none;border-radius:12px;font-size:20px;font-weight:700;cursor:pointer;background:#10b981;color:white;touch-action:manipulation;">✓ Save &amp; New</button>
+                </div>
 
             <div id="import-export-tab" class="tab-content" style="display: none;">
                 <div style="background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
@@ -3023,21 +3241,285 @@
         let ghLastUsedSuffix = localStorage.getItem('ghLastSuffix') || 'MB';
         let lastUsedFormat = localStorage.getItem('skuFormat') || 'manual';
 
+        // All wizard form IDs
+        const ALL_FORMS = {
+            manual: 'manualEntryForm',
+            GH:     'ghEntryForm',
+            GHA:    'ghaEntryForm',
+            MH:     'mhEntryForm',
+            MW:     'mwEntryForm',
+            FDP:    'fdpEntryForm'
+        };
+
         function switchSKUFormat(format) {
+            // Hide all forms
+            Object.values(ALL_FORMS).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+            // Show selected
+            const target = ALL_FORMS[format] || ALL_FORMS.manual;
+            const el = document.getElementById(target);
+            if (el) el.style.display = 'block';
+
             if (format === 'GH') {
-                document.getElementById('manualEntryForm').style.display = 'none';
-                document.getElementById('ghEntryForm').style.display = 'block';
-                // Restore last used suffix
                 document.getElementById('ghSuffix').value = ghLastUsedSuffix;
                 updateGHPreview();
-            } else {
-                document.getElementById('manualEntryForm').style.display = 'block';
-                document.getElementById('ghEntryForm').style.display = 'none';
             }
-            
-            // Save format preference
+            if (format === 'GHA') {
+                ghaLoadSeriesDropdown();
+                ghaUpdatePreview();
+            }
+            if (format === 'MH') mhUpdatePreview();
+            if (format === 'MW') mwUpdatePreview();
+            if (format === 'FDP') fdpUpdatePreview();
+
             lastUsedFormat = format;
             localStorage.setItem('skuFormat', format);
+        }
+
+        // ---- Shared helper: adjust qty for any wizard ----
+        function adjustWizardQty(fieldId, delta) {
+            const input = document.getElementById(fieldId);
+            if (!input) return;
+            input.value = Math.max(0, (parseInt(input.value) || 0) + delta);
+        }
+
+        // ---- Shared save helper ----
+        async function saveWizardEntry(sku, qohId, minId, maxId, locationId, clearFn) {
+            if (!sku) { showNotification('SKU is required', 'error'); return; }
+            const qoh      = parseInt(document.getElementById(qohId).value) || 0;
+            const minVal   = document.getElementById(minId).value !== '' ? parseInt(document.getElementById(minId).value) : null;
+            const maxVal   = document.getElementById(maxId).value !== '' ? parseInt(document.getElementById(maxId).value) : null;
+            const location = document.getElementById(locationId).value.trim().toUpperCase();
+            try {
+                const { error } = await db.from('inventory').upsert({
+                    sku, qty_on_hand: qoh, stock_min: minVal, stock_max: maxVal,
+                    location, updated_at: new Date().toISOString()
+                }, { onConflict: 'sku' });
+                if (error) throw error;
+                await loadInventory();
+                stockEntrySessionCount++;
+                const countEl = document.getElementById('stockEntryCount');
+                if (countEl) countEl.textContent = stockEntrySessionCount;
+                const lastSaved = document.getElementById('stockEntryLastSaved');
+                if (lastSaved) {
+                    lastSaved.textContent = '✓ Saved: ' + sku + '  (QOH: ' + qoh + ')';
+                    lastSaved.style.display = 'block';
+                }
+                clearFn();
+            } catch(e) {
+                showNotification('Error: ' + e.message, 'error');
+            }
+        }
+
+        // ============================================================
+        //  GHA — Gates Adapter Fittings
+        // ============================================================
+        let ghaSeries = JSON.parse(localStorage.getItem('ghaSeries') || '[]');
+
+        function ghaLoadSeriesDropdown() {
+            const sel = document.getElementById('ghaSeriesSelect');
+            if (!sel) return;
+            // Keep first placeholder option
+            sel.innerHTML = '<option value="">— Select or type new —</option>';
+            ghaSeries.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s; opt.textContent = s;
+                sel.appendChild(opt);
+            });
+        }
+
+        function ghaOnSeriesSelect() {
+            const val = document.getElementById('ghaSeriesSelect').value;
+            if (val) {
+                document.getElementById('ghaSeriesNew').value = '';
+            }
+            ghaUpdatePreview();
+            ghaCheckExists();
+        }
+
+        function ghaGetSeries() {
+            const newVal = document.getElementById('ghaSeriesNew').value.trim();
+            if (newVal) return newVal;
+            return document.getElementById('ghaSeriesSelect').value;
+        }
+
+        function ghaUpdatePreview() {
+            const series = ghaGetSeries() || '____';
+            const n1     = document.getElementById('ghaNum1').value || '__';
+            const n2     = document.getElementById('ghaNum2').value || '__';
+            document.getElementById('ghaSKUPreview').textContent = 'GHA-' + series + '-' + n1 + '-' + n2;
+        }
+
+        function ghaCheckExists() {
+            const series = ghaGetSeries();
+            const n1 = document.getElementById('ghaNum1').value.trim();
+            const n2 = document.getElementById('ghaNum2').value.trim();
+            if (!series || !n1 || !n2) { document.getElementById('ghaSkuWarning').style.display = 'none'; return; }
+            const sku = 'GHA-' + series + '-' + n1 + '-' + n2;
+            const existing = inventory.find(i => i.sku === sku);
+            document.getElementById('ghaSkuWarning').style.display = existing ? 'block' : 'none';
+            if (existing) {
+                document.getElementById('ghaQOH').value = existing.qtyOnHand || 0;
+                document.getElementById('ghaMIN').value = existing.stockMin || '';
+                document.getElementById('ghaMAX').value = existing.stockMax || '';
+                document.getElementById('ghaLocation').value = existing.location || '';
+            }
+        }
+
+        async function saveGHAEntry() {
+            const series = ghaGetSeries().trim();
+            const n1     = document.getElementById('ghaNum1').value.trim();
+            const n2     = document.getElementById('ghaNum2').value.trim();
+            if (!series || !n1 || !n2) { showNotification('Please fill in all fields', 'error'); return; }
+            const sku = 'GHA-' + series + '-' + n1 + '-' + n2;
+            // Save series to memory
+            if (!ghaSeries.includes(series)) {
+                ghaSeries.push(series);
+                ghaSeries.sort();
+                localStorage.setItem('ghaSeries', JSON.stringify(ghaSeries));
+                ghaLoadSeriesDropdown();
+            }
+            await saveWizardEntry(sku, 'ghaQOH', 'ghaMIN', 'ghaMAX', 'ghaLocation', () => {
+                document.getElementById('ghaSeriesNew').value = '';
+                document.getElementById('ghaNum1').value = '';
+                document.getElementById('ghaNum2').value = '';
+                document.getElementById('ghaQOH').value  = '0';
+                document.getElementById('ghaSkuWarning').style.display = 'none';
+                ghaUpdatePreview();
+                document.getElementById('ghaNum1').focus();
+            });
+        }
+
+        // ============================================================
+        //  MH — McHale
+        // ============================================================
+        function mhUpdatePreview() {
+            const letters  = document.getElementById('mhLetters').value.toUpperCase() || '___';
+            const numbers  = document.getElementById('mhNumbers').value || '00000';
+            document.getElementById('mhSKUPreview').textContent = 'MH-' + letters + numbers;
+        }
+
+        function mhCheckExists() {
+            const letters = document.getElementById('mhLetters').value.trim().toUpperCase();
+            const numbers = document.getElementById('mhNumbers').value.trim();
+            if (!letters || !numbers) { document.getElementById('mhSkuWarning').style.display = 'none'; return; }
+            const sku = 'MH-' + letters + numbers;
+            const existing = inventory.find(i => i.sku === sku);
+            document.getElementById('mhSkuWarning').style.display = existing ? 'block' : 'none';
+            if (existing) {
+                document.getElementById('mhQOH').value = existing.qtyOnHand || 0;
+                document.getElementById('mhMIN').value = existing.stockMin || '';
+                document.getElementById('mhMAX').value = existing.stockMax || '';
+                document.getElementById('mhLocation').value = existing.location || '';
+            }
+        }
+
+        async function saveMHEntry() {
+            const letters = document.getElementById('mhLetters').value.trim().toUpperCase();
+            const numbers = document.getElementById('mhNumbers').value.trim();
+            if (!letters || letters.length !== 3) { showNotification('Enter exactly 3 letters', 'error'); return; }
+            if (!numbers || numbers.length !== 5)  { showNotification('Enter exactly 5 numbers', 'error'); return; }
+            const sku = 'MH-' + letters + numbers;
+            await saveWizardEntry(sku, 'mhQOH', 'mhMIN', 'mhMAX', 'mhLocation', () => {
+                document.getElementById('mhLetters').value = '';
+                document.getElementById('mhNumbers').value = '';
+                document.getElementById('mhQOH').value     = '0';
+                document.getElementById('mhSkuWarning').style.display = 'none';
+                mhUpdatePreview();
+                document.getElementById('mhLetters').focus();
+            });
+        }
+
+        // ============================================================
+        //  MW — Martin Welding
+        // ============================================================
+        function mwAutoFormat(input) {
+            // Strip MW prefix if user typed it, strip all dashes, uppercase
+            let raw = input.value.replace(/^MW/i, '').replace(/-/g, '').toUpperCase();
+            // Separate digits from trailing letters
+            const digitMatch = raw.match(/^(\d{0,12})(.*)/);
+            const digits  = digitMatch ? digitMatch[1] : '';
+            const letters = digitMatch ? digitMatch[2] : '';
+            // Insert dashes at positions 4 and 8 within the digits
+            let formatted = '';
+            if (digits.length <= 4)       formatted = digits;
+            else if (digits.length <= 8)  formatted = digits.slice(0,4) + '-' + digits.slice(4);
+            else                          formatted = digits.slice(0,4) + '-' + digits.slice(4,8) + '-' + digits.slice(8);
+            // Append any letters (suffix)
+            input.value = formatted + letters;
+            mwUpdatePreview();
+        }
+
+        function mwGetSKU() {
+            const val = document.getElementById('mwRawInput').value.trim().toUpperCase();
+            return val ? 'MW' + val : '';
+        }
+
+        function mwUpdatePreview() {
+            const sku = mwGetSKU();
+            document.getElementById('mwSKUPreview').textContent = sku || 'MW____-____-___';
+        }
+
+        function mwCheckExists() {
+            const sku = mwGetSKU();
+            if (!sku) { document.getElementById('mwSkuWarning').style.display = 'none'; return; }
+            const existing = inventory.find(i => i.sku === sku);
+            document.getElementById('mwSkuWarning').style.display = existing ? 'block' : 'none';
+            if (existing) {
+                document.getElementById('mwQOH').value = existing.qtyOnHand || 0;
+                document.getElementById('mwMIN').value = existing.stockMin || '';
+                document.getElementById('mwMAX').value = existing.stockMax || '';
+                document.getElementById('mwLocation').value = existing.location || '';
+            }
+        }
+
+        async function saveMWEntry() {
+            const sku = mwGetSKU();
+            if (!sku || sku.length < 6) { showNotification('Please enter the part number', 'error'); return; }
+            await saveWizardEntry(sku, 'mwQOH', 'mwMIN', 'mwMAX', 'mwLocation', () => {
+                document.getElementById('mwRawInput').value = '';
+                document.getElementById('mwQOH').value      = '0';
+                document.getElementById('mwSkuWarning').style.display = 'none';
+                mwUpdatePreview();
+                document.getElementById('mwRawInput').focus();
+            });
+        }
+
+        // ============================================================
+        //  FDP — Donaldson
+        // ============================================================
+        function fdpUpdatePreview() {
+            const nums = document.getElementById('fdpNumbers').value || '______';
+            document.getElementById('fdpSKUPreview').textContent = 'FDP' + nums;
+        }
+
+        function fdpCheckExists() {
+            const nums = document.getElementById('fdpNumbers').value.trim();
+            if (!nums) { document.getElementById('fdpSkuWarning').style.display = 'none'; return; }
+            const sku = 'FDP' + nums;
+            const existing = inventory.find(i => i.sku === sku);
+            document.getElementById('fdpSkuWarning').style.display = existing ? 'block' : 'none';
+            if (existing) {
+                document.getElementById('fdpQOH').value = existing.qtyOnHand || 0;
+                document.getElementById('fdpMIN').value = existing.stockMin || '';
+                document.getElementById('fdpMAX').value = existing.stockMax || '';
+                document.getElementById('fdpLocation').value = existing.location || '';
+            }
+        }
+
+        async function saveFDPEntry() {
+            const nums = document.getElementById('fdpNumbers').value.trim();
+            if (!nums) { showNotification('Please enter the part number', 'error'); return; }
+            const sku = 'FDP' + nums;
+            await saveWizardEntry(sku, 'fdpQOH', 'fdpMIN', 'fdpMAX', 'fdpLocation', () => {
+                document.getElementById('fdpNumbers').value = '';
+                document.getElementById('fdpQOH').value     = '0';
+                document.getElementById('fdpSkuWarning').style.display = 'none';
+                fdpUpdatePreview();
+                document.getElementById('fdpNumbers').focus();
+            });
         }
 
         function updateGHPreview() {
