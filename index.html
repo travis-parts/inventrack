@@ -854,37 +854,16 @@
                 <!-- GHA — Gates Adapter Fittings -->
                 <div id="ghaEntryForm" style="display:none; background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08); padding:20px;">
                     <div style="background:#fef9c3; border:2px solid #fde047; padding:10px 14px; border-radius:8px; margin-bottom:16px; font-size:13px; color:#713f12; font-weight:600;">
-                        Format: GHA-{series}-{2 digits}-{2 digits}
+                        Format: GHA{4}-{2}-{2} &nbsp;e.g. GHA1503-06-06
                     </div>
                     <div id="ghaSkuWarning" style="display:none; color:#ef4444; font-size:13px; margin-bottom:12px; font-weight:600;">⚠️ SKU already exists — saving will update it</div>
 
-                    <!-- Series selector -->
                     <div style="margin-bottom:16px;">
-                        <label style="display:block; font-size:13px; font-weight:700; color:#64748b; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Series (4 digits) *</label>
-                        <div style="display:flex; gap:8px;">
-                            <select id="ghaSeriesSelect" onchange="ghaOnSeriesSelect()" style="flex:1; padding:14px; border:2px solid #e2e8f0; border-radius:10px; font-size:16px; font-weight:600; background:white;">
-                                <option value="">— Select or type new —</option>
-                            </select>
-                            <input type="text" id="ghaSeriesNew" placeholder="New" inputmode="numeric" maxlength="4"
-                                   oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4); ghaUpdatePreview();"
-                                   style="width:90px; padding:14px; border:2px solid #e2e8f0; border-radius:10px; font-size:16px; font-weight:700; text-align:center; box-sizing:border-box;">
-                        </div>
-                    </div>
-
-                    <!-- Two 2-digit fields -->
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
-                        <div>
-                            <label style="display:block; font-size:13px; font-weight:700; color:#64748b; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">2 Digits *</label>
-                            <input type="text" id="ghaNum1" placeholder="06" inputmode="numeric" maxlength="2"
-                                   oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,2); ghaUpdatePreview(); ghaCheckExists();"
-                                   style="width:100%; padding:14px; border:2px solid #e2e8f0; border-radius:10px; font-size:20px; font-weight:700; text-align:center; box-sizing:border-box;">
-                        </div>
-                        <div>
-                            <label style="display:block; font-size:13px; font-weight:700; color:#64748b; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">2 Digits *</label>
-                            <input type="text" id="ghaNum2" placeholder="02" inputmode="numeric" maxlength="2"
-                                   oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,2); ghaUpdatePreview(); ghaCheckExists();"
-                                   style="width:100%; padding:14px; border:2px solid #e2e8f0; border-radius:10px; font-size:20px; font-weight:700; text-align:center; box-sizing:border-box;">
-                        </div>
+                        <label style="display:block; font-size:13px; font-weight:700; color:#64748b; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Type all 8 digits (auto-formats) *</label>
+                        <input type="text" id="ghaRawInput" placeholder="15030606" inputmode="numeric"
+                               oninput="ghaAutoFormat(this); ghaCheckExistsDebounced();"
+                               style="width:100%; padding:14px; border:2px solid #e2e8f0; border-radius:10px; font-size:22px; font-weight:700; box-sizing:border-box; letter-spacing:2px;">
+                        <div style="font-size:12px; color:#94a3b8; margin-top:6px;">Dashes insert automatically after digits 4 and 6.</div>
                     </div>
 
                     <!-- Preview -->
@@ -931,13 +910,13 @@
                             <label style="display:block; font-size:13px; font-weight:700; color:#64748b; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">3 Letters *</label>
                             <input type="text" id="mhLetters" placeholder="CPL" maxlength="3"
                                    autocapitalize="characters" autocorrect="off"
-                                   oninput="this.value=this.value.replace(/[^a-zA-Z]/g,'').toUpperCase().slice(0,3); mhUpdatePreview(); mhCheckExists();"
+                                   oninput="this.value=this.value.replace(/[^a-zA-Z]/g,'').toUpperCase().slice(0,3); mhUpdatePreview(); mhCheckExistsDebounced();"
                                    style="width:100%; padding:14px; border:2px solid #e2e8f0; border-radius:10px; font-size:22px; font-weight:700; text-align:center; box-sizing:border-box; text-transform:uppercase; letter-spacing:3px;">
                         </div>
                         <div>
                             <label style="display:block; font-size:13px; font-weight:700; color:#64748b; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">5 Numbers *</label>
                             <input type="text" id="mhNumbers" placeholder="00043" maxlength="5" inputmode="numeric"
-                                   oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,5); mhUpdatePreview(); mhCheckExists();"
+                                   oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,5); mhUpdatePreview(); mhCheckExistsDebounced();"
                                    style="width:100%; padding:14px; border:2px solid #e2e8f0; border-radius:10px; font-size:22px; font-weight:700; text-align:center; box-sizing:border-box; letter-spacing:2px;">
                         </div>
                     </div>
@@ -985,7 +964,7 @@
                         <label style="display:block; font-size:13px; font-weight:700; color:#64748b; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Type numbers (auto-formats) *</label>
                         <input type="text" id="mwRawInput" placeholder="2018761515800BSK" inputmode="numeric"
                                autocapitalize="characters" autocorrect="off"
-                               oninput="mwAutoFormat(this); mwCheckExists();"
+                               oninput="mwAutoFormat(this); mwCheckExistsDebounced();"
                                style="width:100%; padding:14px; border:2px solid #e2e8f0; border-radius:10px; font-size:18px; font-weight:700; box-sizing:border-box; text-transform:uppercase; letter-spacing:1px;">
                         <div style="font-size:12px; color:#94a3b8; margin-top:6px;">Type digits — dashes insert automatically. Switch to QWERTY for letters at the end.</div>
                     </div>
@@ -1031,7 +1010,7 @@
                     <div style="margin-bottom:16px;">
                         <label style="display:block; font-size:13px; font-weight:700; color:#64748b; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Part Numbers *</label>
                         <input type="text" id="fdpNumbers" placeholder="550325" inputmode="numeric"
-                               oninput="this.value=this.value.replace(/[^0-9]/g,''); fdpUpdatePreview(); fdpCheckExists();"
+                               oninput="this.value=this.value.replace(/[^0-9]/g,''); fdpUpdatePreview(); fdpCheckExistsDebounced();"
                                style="width:100%; padding:16px; border:2px solid #e2e8f0; border-radius:10px; font-size:22px; font-weight:700; text-align:center; box-sizing:border-box; letter-spacing:2px;">
                     </div>
 
@@ -3268,7 +3247,6 @@
                 updateGHPreview();
             }
             if (format === 'GHA') {
-                ghaLoadSeriesDropdown();
                 ghaUpdatePreview();
             }
             if (format === 'MH') mhUpdatePreview();
@@ -3319,84 +3297,66 @@
         }
 
         // ============================================================
+        //  Debounce utility - delays expensive checks until typing stops
+        // ============================================================
+        function debounce(fn, delay) {
+            let timer;
+            return function(...args) {
+                clearTimeout(timer);
+                timer = setTimeout(() => fn.apply(this, args), delay);
+            };
+        }
+
+        // ============================================================
         //  GHA — Gates Adapter Fittings
         // ============================================================
-        let ghaSeries = JSON.parse(localStorage.getItem('ghaSeries') || '[]');
 
-        function ghaLoadSeriesDropdown() {
-            const sel = document.getElementById('ghaSeriesSelect');
-            if (!sel) return;
-            // Keep first placeholder option
-            sel.innerHTML = '<option value="">— Select or type new —</option>';
-            ghaSeries.forEach(s => {
-                const opt = document.createElement('option');
-                opt.value = s; opt.textContent = s;
-                sel.appendChild(opt);
-            });
-        }
-
-        function ghaOnSeriesSelect() {
-            const val = document.getElementById('ghaSeriesSelect').value;
-            if (val) {
-                document.getElementById('ghaSeriesNew').value = '';
-            }
+        function ghaAutoFormat(input) {
+            let raw = input.value.replace(/^GHA/i, '').replace(/-/g, '').replace(/[^0-9]/g, '').slice(0, 8);
+            let formatted = '';
+            if (raw.length <= 4)      formatted = raw;
+            else if (raw.length <= 6) formatted = raw.slice(0,4) + '-' + raw.slice(4);
+            else                      formatted = raw.slice(0,4) + '-' + raw.slice(4,6) + '-' + raw.slice(6);
+            input.value = formatted;
             ghaUpdatePreview();
-            ghaCheckExists();
         }
 
-        function ghaGetSeries() {
-            const newVal = document.getElementById('ghaSeriesNew').value.trim();
-            if (newVal) return newVal;
-            return document.getElementById('ghaSeriesSelect').value;
+        function ghaGetSKU() {
+            const val = document.getElementById('ghaRawInput').value.trim();
+            return val ? 'GHA' + val : '';
         }
 
         function ghaUpdatePreview() {
-            const series = ghaGetSeries() || '____';
-            const n1     = document.getElementById('ghaNum1').value || '__';
-            const n2     = document.getElementById('ghaNum2').value || '__';
-            document.getElementById('ghaSKUPreview').textContent = 'GHA-' + series + '-' + n1 + '-' + n2;
+            const sku = ghaGetSKU();
+            document.getElementById('ghaSKUPreview').textContent = sku || 'GHA____-__-__';
         }
 
         function ghaCheckExists() {
-            const series = ghaGetSeries();
-            const n1 = document.getElementById('ghaNum1').value.trim();
-            const n2 = document.getElementById('ghaNum2').value.trim();
-            if (!series || !n1 || !n2) { document.getElementById('ghaSkuWarning').style.display = 'none'; return; }
-            const sku = 'GHA-' + series + '-' + n1 + '-' + n2;
+            const sku = ghaGetSKU();
+            if (!sku) { document.getElementById('ghaSkuWarning').style.display = 'none'; return; }
             const existing = inventory.find(i => i.sku === sku);
             document.getElementById('ghaSkuWarning').style.display = existing ? 'block' : 'none';
             if (existing) {
-                document.getElementById('ghaQOH').value = existing.qtyOnHand || 0;
-                document.getElementById('ghaMIN').value = existing.stockMin || '';
-                document.getElementById('ghaMAX').value = existing.stockMax || '';
+                document.getElementById('ghaQOH').value      = existing.qtyOnHand || 0;
+                document.getElementById('ghaMIN').value      = existing.stockMin || '';
+                document.getElementById('ghaMAX').value      = existing.stockMax || '';
                 document.getElementById('ghaLocation').value = existing.location || '';
             }
         }
 
         async function saveGHAEntry() {
-            const series = ghaGetSeries().trim();
-            const n1     = document.getElementById('ghaNum1').value.trim();
-            const n2     = document.getElementById('ghaNum2').value.trim();
-            if (!series || !n1 || !n2) { showNotification('Please fill in all fields', 'error'); return; }
-            const sku = 'GHA-' + series + '-' + n1 + '-' + n2;
-            // Save series to memory
-            if (!ghaSeries.includes(series)) {
-                ghaSeries.push(series);
-                ghaSeries.sort();
-                localStorage.setItem('ghaSeries', JSON.stringify(ghaSeries));
-                ghaLoadSeriesDropdown();
+            const sku = ghaGetSKU();
+            if (!sku || sku.replace(/[^0-9]/g,'').length < 8) {
+                showNotification('Please enter all 8 digits', 'error'); return;
             }
             await saveWizardEntry(sku, 'ghaQOH', 'ghaMIN', 'ghaMAX', 'ghaLocation', () => {
-                document.getElementById('ghaSeriesNew').value = '';
-                document.getElementById('ghaNum1').value = '';
-                document.getElementById('ghaNum2').value = '';
-                document.getElementById('ghaQOH').value  = '0';
+                document.getElementById('ghaRawInput').value = '';
+                document.getElementById('ghaQOH').value      = '0';
                 document.getElementById('ghaSkuWarning').style.display = 'none';
                 ghaUpdatePreview();
-                document.getElementById('ghaNum1').focus();
+                document.getElementById('ghaRawInput').focus();
             });
         }
-
         // ============================================================
         //  MH — McHale
         // ============================================================
